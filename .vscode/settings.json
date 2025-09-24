@@ -1,0 +1,18 @@
+{
+    "files.associations": {
+        "zlib.h": "c",
+        "myclipboard.h": "c",
+        "clipboard.h": "c",
+        "log.h": "c",
+        "pthread.h": "c",
+        "xcb_keysyms.h": "c",
+        "xcb.h": "c",
+        "stdint.h": "c",
+        "helper.h": "c",
+        "xproto.h": "c",
+        "time.h": "c",
+        "stdarg.h": "c",
+        "global.h": "c",
+        "ui.h": "c"
+    }
+}
