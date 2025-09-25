@@ -6,6 +6,21 @@
 
 #include <pthread.h>
 
+// void* clipboardControlService(void* pv){
+//     __entry("clipboardControlService(%p)", pv);
+
+//     while(hasFlag(systemStatusFlag, SYS_RUNNING)){
+//         entryCriticalSection(&clickedClipboardIDMutexLock);
+//         if(currentHistoryIndex > 0){
+
+//         }
+//         exitCriticalSection(&clickedClipboardIDMutexLock);
+
+//         SDL_Delay(100);
+//     }
+
+//     __exit("clipboardControlService");
+// }
 
 void* clipboardCaptureService(void* pv){
     __entry("clipboardCaptureService(%p)", pv);
@@ -46,6 +61,41 @@ void* clipboardCaptureService(void* pv){
     while (hasFlag(systemStatusFlag, SYS_RUNNING)) {
         int saved = handle_poll_clipboard(c, win, &nextid);
         (void)saved;
+
+        if(hasFlag(uiStatusFlag, CB_MOUSE_CLICKED)){
+
+            entryCriticalSection(&uiFlagMutexLock);
+            clrFlag(uiStatusFlag, CB_MOUSE_CLICKED);
+            exitCriticalSection(&uiFlagMutexLock);
+
+            __log("[clipboardCaptureService] Looking for cbBlock...");
+            
+            for(int i = 0; i < clickedClipboardNum; ++i){
+                // if( cbba[i].row  )
+                __log(
+                    "[clipboardCaptureService] Block %d : [r0:%d r1:%d c0:%d c1:%d] <-- [Y:%d, X:%d]", 
+                    i + currentHistoryIndex,
+                    cbba[i].row, 
+                    cbba[i].row + cbba[i].h,
+                    cbba[i].col,
+                    cbba[i].col + cbba[i].w,
+                    cbClickedMouseInfo.mouseY,
+                    cbClickedMouseInfo.mouseX
+                );
+                if(
+                    cbba[i].row <= cbClickedMouseInfo.mouseY &&
+                    cbClickedMouseInfo.mouseY < cbba[i].row + cbba[i].h &&
+                    cbba[i].col <= cbClickedMouseInfo.mouseX &&
+                    cbClickedMouseInfo.mouseY < cbba[i].col + cbba[i].w
+                ){
+                    __log("[clipboardCaptureService] Restore: %s", historyList[currentHistoryIndex + i]);
+                    restoreClipboardContent(c, win, historyList[currentHistoryIndex + i]);
+                    break;
+                }
+            }
+
+        }
+
         /* sleep POLL_MS ms */
         usleep(POLL_MS * 1000);
     }
@@ -67,6 +117,20 @@ void* keyboardCaptureService(void* pv){
                     __log("Event <SDL_QUIT> occured!");
                     clrFlag(systemStatusFlag, SYS_RUNNING);
                     break;
+                    
+                case SDL_MOUSEBUTTONDOWN:
+                    if (e.button.button == SDL_BUTTON_LEFT) {
+                        int mouseX = e.button.x;
+                        int mouseY = e.button.y;
+                        __log("Mouse down at (%d, %d)\n", mouseX, mouseY);
+                        cbClickedMouseInfo.mouseX = mouseX;
+                        cbClickedMouseInfo.mouseY = mouseY;
+                        entryCriticalSection(&uiFlagMutexLock);
+                        setFlag(uiStatusFlag, CB_MOUSE_CLICKED);
+                        exitCriticalSection(&uiFlagMutexLock);
+                    }
+                    break;
+
                 case SDL_MOUSEWHEEL:
                     if (e.wheel.y > 0) {
                         __log("Mouse wheel UP");

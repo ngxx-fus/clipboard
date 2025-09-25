@@ -38,30 +38,34 @@ int main(void) {
 
     __log("Load history!");
     int index = 0;
+    int itemNum = 1;
+    itemNum = readClipboardHistory(historyList, HISTORY_SIZE);
+    renderHistory(mainWin, cbba, index);
+
     while(hasFlag(systemStatusFlag, SYS_RUNNING)) {
         if(hasFlag(uiStatusFlag, CB_SCROLL_DOWN)){
             entryCriticalSection(&uiFlagMutexLock);
             clrFlag(uiStatusFlag, CB_SCROLL_DOWN);
             exitCriticalSection(&uiFlagMutexLock);
 
-            index = (index + 1) % HISTORY_SIZE;
-            renderHistory(mainWin, index, 10);
+            index = (index + 1) % itemNum;
+            renderHistory(mainWin, cbba, index);
         }
         if(hasFlag(uiStatusFlag, CB_SCROLL_UP)){
             entryCriticalSection(&uiFlagMutexLock);
             clrFlag(uiStatusFlag, CB_SCROLL_UP);
             exitCriticalSection(&uiFlagMutexLock);
 
-            index = (index - 1 + HISTORY_SIZE) % HISTORY_SIZE;
-            renderHistory(mainWin, index, 10);
+            index = (index - 1 + itemNum) % itemNum;
+            renderHistory(mainWin, cbba, index);
         }
         if(hasFlag(uiStatusFlag, CB_RELOAD)){
             entryCriticalSection(&uiFlagMutexLock);
             clrFlag(uiStatusFlag, CB_RELOAD);
             exitCriticalSection(&uiFlagMutexLock);
 
-            readClipboardHistory(historyList, HISTORY_SIZE);
-            renderHistory(mainWin, index,  25);
+            itemNum = readClipboardHistory(historyList, HISTORY_SIZE);
+            renderHistory(mainWin, cbba, index);
         }
         __sleep_us(100);
     }

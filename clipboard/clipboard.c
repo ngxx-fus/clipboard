@@ -236,3 +236,98 @@ int handle_poll_clipboard(xcb_connection_t *c, xcb_window_t win, unsigned int *n
     }
     return saved;
 }
+
+
+int restoreClipboardContent(xcb_connection_t *c,
+                            xcb_window_t win,
+                            const char *historyPath)
+{
+    if (!historyPath) {
+        __err("restoreClipboardContent: NULL path");
+        return -1;
+    }
+
+    const char *ext = strrchr(historyPath, '.');
+    if (!ext) {
+        __err("restoreClipboardContent: no extension in path %s", historyPath);
+        return -1;
+    }
+
+    if (strcmp(ext, ".gz") == 0) {
+        // restore TEXT
+        gzFile gz = gzopen(historyPath, "rb");
+        if (!gz) {
+            __err("gzopen failed for %s", historyPath);
+            return -1;
+        }
+
+        // đọc hết file (ở đây cho fixed-size, bạn có thể stat() để biết kích thước trước)
+        size_t cap = 1024 * 1024;
+        char *buf = malloc(cap);
+        if (!buf) {
+            gzclose(gz);
+            __err("malloc failed");
+            return -1;
+        }
+        int n = gzread(gz, buf, cap - 1);
+        if (n < 0) {
+            int errnum;
+            const char *errmsg = gzerror(gz, &errnum);
+            __err("gzread error: %s", errmsg);
+            free(buf);
+            gzclose(gz);
+            return -1;
+        }
+        buf[n] = '\0';
+        gzclose(gz);
+
+        xcb_change_property(c, XCB_PROP_MODE_REPLACE, win,
+                            atom_clipboard, atom_utf8, 8,
+                            n, buf);
+        xcb_flush(c);
+
+        __log("Restored TEXT to clipboard from %s", historyPath);
+
+        free(buf);
+        return 0;
+    }
+
+    if (strcmp(ext, ".png") == 0 || strcmp(ext, ".jpg") == 0) {
+        // restore IMAGE
+        FILE *f = fopen(historyPath, "rb");
+        if (!f) {
+            __err("fopen failed for %s", historyPath);
+            return -1;
+        }
+        fseek(f, 0, SEEK_END);
+        long len = ftell(f);
+        fseek(f, 0, SEEK_SET);
+        if (len <= 0) {
+            fclose(f);
+            __err("file length invalid %s", historyPath);
+            return -1;
+        }
+        void *buf = malloc(len);
+        if (!buf) {
+            fclose(f);
+            __err("malloc failed");
+            return -1;
+        }
+        fread(buf, 1, len, f);
+        fclose(f);
+
+        xcb_atom_t mime = (strcmp(ext, ".png") == 0) ? atom_png : atom_jpeg;
+        xcb_change_property(c, XCB_PROP_MODE_REPLACE, win,
+                            atom_clipboard, mime, 8,
+                            len, buf);
+        xcb_flush(c);
+
+        __log("Restored IMAGE (%s) to clipboard from %s", ext+1, historyPath);
+
+        free(buf);
+        return 0;
+    }
+
+    __err("restoreClipboardContent: unsupported extension %s", ext);
+    return -1;
+}

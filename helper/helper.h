@@ -29,8 +29,8 @@
  * @param b The ending value (exclusive).
  * @example REPT(int, i, 0, 5) iterates i from 0 to 4.
  */
-#ifndef REPTT
-    #define REPTT(type, i, a, b) for(type i = (a); (i) < (b); ++(i))
+#ifndef REPT
+    #define REPT(type, i, a, b) for(type i = (a); (i) < (b); ++(i))
 #endif
 
 /**

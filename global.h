@@ -9,7 +9,7 @@
 #define CLIPBOARD_HEIGHT            480 
 #define CLIPBOARD_TITLE             "Ngxxfus' clipboard"
 #define FONT_PATH                   "/usr/share/fonts/TTF/DejaVuSans.ttf"
-#define FONT_SIZE                   18
+#define FONT_SIZE                   12
 #define HISTORY_SIZE                1000 /* adjustable */
 #define POLL_MS                     200
 #define BASE_DIR                    "/tmp/clipboard"

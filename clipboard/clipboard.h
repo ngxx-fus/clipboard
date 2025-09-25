@@ -90,3 +90,4 @@ xcb_get_property_reply_t *wait_for_property(xcb_connection_t *c, xcb_window_t wi
 /* Poll and handle one clipboard snapshot. Returns 1 if something saved, 0 otherwise */
 int handle_poll_clipboard(xcb_connection_t *c, xcb_window_t win, unsigned int *nextid);
 
+int restoreClipboardContent(xcb_connection_t *c, xcb_window_t win, const char *historyPath);

@@ -13,6 +13,9 @@
         "time.h": "c",
         "stdarg.h": "c",
         "global.h": "c",
-        "ui.h": "c"
+        "ui.h": "c",
+        "algorithm": "c",
+        "format": "c",
+        "charconv": "c"
     }
 }
