@@ -86,6 +86,14 @@ extern "C" {
 #define COLOR_RGB_FOOTER        DDDDDD
 #define COLOR_RGB_HEADER        DDDDDD
 
+/// ??? ?????? ////////////////////////////////////////////////////////////////////////////////////
+
+#define CBMW_MARGIN_TOP         50
+#define CBMW_MARGIN_BOTTOM      40
+#define CBMW_MARGIN_LEFT        40
+#define CBMW_MARGIN_RIGHT       40
+#define CBMW_ITEM_NUM           200
+
 /// FIXED SECTION | DO NOT CHANGE /////////////////////////////////////////////////////////////////
 
 #define _COLOR_RGB_COMBINE(hex) 0x##hex##FFu                /// Get value of hex if it's macro.

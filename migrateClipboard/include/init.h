@@ -1,5 +1,7 @@
 #include "task.h"
 
+
+
 void myClipboardInit(){
     __entry("myClipboardInit()");
     
@@ -32,6 +34,13 @@ void myClipboardInit(){
     createWindowContext(&cbMainWindow, CLIPBOARD_WIDTH, CLIPBOARD_HEIGHT, CLIPBOARD_TITLE);
     __cbpuCreatePopup();
     cbpuHidePopup();
+    cbmwTempTexture = SDL_CreateTexture(
+            cbMainWindow->renderer,
+            SDL_PIXELFORMAT_RGBA8888,
+            SDL_TEXTUREACCESS_TARGET, /// SDL_TEXTUREACCESS_STREAMING,
+            cbMainWindow->w,
+            cbMainWindow->h
+        );
 
     __log("[myClipboardInit] [+task] clipboardCaptureDaemon");
     pthread_t clipboardCaptureDaemon;

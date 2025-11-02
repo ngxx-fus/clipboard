@@ -25,6 +25,7 @@
         "fontutil.h": "c",
         "task.h": "c",
         "stdint.h": "c",
-        "arithmetic.h": "c"
+        "arithmetic.h": "c",
+        "numbers": "c"
     }
 }

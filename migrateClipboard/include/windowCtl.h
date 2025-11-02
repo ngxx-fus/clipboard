@@ -22,7 +22,32 @@ typedef union cbWindowContexts{
 cbWindowContexts wdcts;
 
 #define cbMainWindow    (wdcts.main)
-#define fontBodyH       TTF_FontHeight(systemFont.body.ttf)     
+#define fontBodyH       TTF_FontHeight(systemFont.body.ttf)
+
+SDL_Texture *cbmwTempTexture;
+
+typedef union cbmwItemInfo_t{
+    SDL_Rect SDL;
+    struct {
+        int col, row;
+        int w, h;
+        int id;
+    };
+} cbmwItemInfo_t;
+
+enum UI_STATUS_BITORDER{
+    CB_RELOAD = 0,
+    CB_SCROLL_UP,
+    CB_SCROLL_DOWN,
+    CB_MOUSE_CLICKED
+};
+
+cbmwItemInfo_t      cbmwItemArea[CBMW_ITEM_NUM] = {};
+int                 cbmwItemNum = 0;
+int                 cbmwCurrentItemIndex = 0;
+int                 cbmwMouseX, cbmwMouseY;
+char                cbmwItemContent[CBMW_ITEM_NUM][256];
+
 
 void cbmwSetRenderTargetOnScreen(){
     SDL_SetRenderTarget(cbMainWindow->renderer, NULL);
@@ -33,7 +58,6 @@ void cbmwSetRenderTargetOffScreen(){
 }
 
 void cbmwClearBackground(){
-    cbMainWindow;
     SDL_SetRenderDrawColor(cbMainWindow->renderer, splitRGBA(systemColor.background));
     SDL_RenderClear(cbMainWindow->renderer);
 }
@@ -109,7 +133,7 @@ void cbmwDrawInfo(){
     );
 }
 
-SDL_Rect cbmwDrawTextItem(dim_t rowStart, const char * text){
+SDL_Rect cbmwDrawTextItem(int id, dim_t rowStart, const char * text){
     __entry1("cbmwDrawTextItem(%d, %s)",rowStart, text);
     SDL_Rect itemBg = {0, 0, 0, 0};
     
@@ -120,7 +144,7 @@ SDL_Rect cbmwDrawTextItem(dim_t rowStart, const char * text){
     // static dim_t marginTxtW    = 5;
     // static dim_t marginTxtH    = 5;
 
-    if(rowStart > cbMainWindow->h - 2*marginWinH) return itemBg;
+    if(rowStart > cbMainWindow->h) return itemBg;
 
     /// r:50|c:40 ---> r:16|c:W-60
     itemBg.y = (rowStart < marginWinH) ? marginWinH :(rowStart); 
@@ -157,6 +181,12 @@ SDL_Rect cbmwDrawTextItem(dim_t rowStart, const char * text){
         .h = itemBg.h - marginBgH * 2
     };
 
+    cbmwItemArea[id].id = id;
+    cbmwItemArea[id].SDL.x = itemBg.x;
+    cbmwItemArea[id].SDL.y = itemBg.y;
+    cbmwItemArea[id].SDL.w = itemBg.w;
+    cbmwItemArea[id].SDL.h = itemBg.h;
+
     SDL_Rect itemSourceText = {
         .x = 0,
         .y = 0,
@@ -190,6 +220,37 @@ SDL_Rect cbmwDrawTextItem(dim_t rowStart, const char * text){
     __exit1("cbmwDrawTextItem()");
     return itemBg;
 }
+
+int cbmwItemClickedFind(){
+    REP(i, 0, cbmwItemNum){
+        if(cbmwItemArea[i].col <= cbmwMouseX && (cbmwMouseX <= cbmwItemArea[i].col + cbmwItemArea[i].w)
+            && cbmwItemArea[i].row <= cbmwMouseY && cbmwMouseY <= (cbmwItemArea[i].row + cbmwItemArea[i].h)){
+                cbmwMouseX = -1;
+                cbmwMouseY = -1;
+                return i;
+            }
+    }
+    return -1;
+}
+
+def cbmwItemChangeContent(int id, const char * newContent){
+    if(id >= cbmwItemNum) return ERR;
+    snprintf(cbmwItemContent[id], 256, "%s", newContent);
+}
+
+def cbmwItemAppendContent(const char * newContent){
+    if(cbmwItemNum >= CBMW_ITEM_NUM) return ERR;
+    snprintf(cbmwItemContent[cbmwItemNum], 256, "%s", newContent);
+    return ++cbmwItemNum;
+}
+
+def cbmwDrawItemId(int id){
+    if(id < 1)
+        cbmwDrawTextItem(id, 0, cbmwItemContent[id]);
+    else
+        cbmwDrawTextItem(id, cbmwItemArea[id-1].row+cbmwItemArea[id-1].h+10, cbmwItemContent[id]);
+}
+    
 
 /// POP-UP ////////////////////////////////////////////////////////////////////////////////////////
 /// cbpu = Clipboard pop-up

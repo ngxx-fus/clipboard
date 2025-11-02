@@ -47,39 +47,6 @@ void* clipboardCaptureService(void* pv){
         int saved = handle_poll_clipboard(c, win, &nextid);
         (void)saved;
 
-        if(__systemFlagCheck(CB_MOUSE_CLICKED)){
-
-            // __clearFlagBit(uiStatusFlag, CB_MOUSE_CLICKED);
-            __systemFlagClr(CB_MOUSE_CLICKED);
-
-            __log("[clipboardCaptureService] Looking for cbBlock...");
-            
-            for(int i = 0; i < cbClickedClipboardNum; ++i){
-                // if( cbba[i].row  )
-                __log(
-                    "[clipboardCaptureService] Block %d : [r0:%d r1:%d c0:%d c1:%d] <-- [Y:%d, X:%d]", 
-                    i + cbCurrentHistoryIndex,
-                    cbba[i].row, 
-                    cbba[i].row + cbba[i].h,
-                    cbba[i].col,
-                    cbba[i].col + cbba[i].w,
-                    cbClickedMouseInfo.mouseY,
-                    cbClickedMouseInfo.mouseX
-                );
-                if(
-                    cbba[i].row <= cbClickedMouseInfo.mouseY &&
-                    cbClickedMouseInfo.mouseY < cbba[i].row + cbba[i].h &&
-                    cbba[i].col <= cbClickedMouseInfo.mouseX &&
-                    cbClickedMouseInfo.mouseY < cbba[i].col + cbba[i].w
-                ){
-                    __log("[clipboardCaptureService] Restore: %s", historyPathFileList[cbCurrentHistoryIndex + i]);
-                    restoreClipboardContent(c, win, historyPathFileList[cbCurrentHistoryIndex + i]);
-                    break;
-                }
-            }
-
-        }
-
         /* sleep POLL_MS ms */
         usleep(POLL_MS * 1000);
     }
@@ -119,25 +86,41 @@ void* cbTestThread(void* pv){
         __sleep_ns(1000);
     }while(1);
 
-    
+    SDL_SetRenderTarget(cbMainWindow->renderer, cbmwTempTexture);
+    cbmwClearBackground();
+
+    cbmwItemAppendContent("This is a default clipboard content. Replace it with your actual content. (Vietnamese: Đây là nội dung mẫu. Hãy thay thế nội dung mẫu này bằng nội dung thực.) This is a default clipboard content. Replace it with your actual content. (Vietnamese: Đây là nội dung mẫu. Hãy thay thế nội dung mẫu này bằng nội dung thực.)");
+    cbmwItemAppendContent("This is a default clipboard content. Replace it with your actual content. (Vietnamese: Đây là nội dung mẫu. Hãy thay thế nội dung mẫu này bằng nội dung thực.) This is a default clipboard content. Replace it with your actual content. (Vietnamese: Đây là nội dung mẫu. Hãy thay thế nội dung mẫu này bằng nội dung thực.)");
+    cbmwItemAppendContent("This is a default clipboard content. Replace it with your actual content. (Vietnamese: Đây là nội dung mẫu. Hãy thay thế nội dung mẫu này bằng nội dung thực.) This is a default clipboard content. Replace it with your actual content. (Vietnamese: Đây là nội dung mẫu. Hãy thay thế nội dung mẫu này bằng nội dung thực.)");
+    cbmwItemAppendContent("This is a default clipboard content. Replace it with your actual content. (Vietnamese: Đây là nội dung mẫu. Hãy thay thế nội dung mẫu này bằng nội dung thực.) This is a default clipboard content. Replace it with your actual content. (Vietnamese: Đây là nội dung mẫu. Hãy thay thế nội dung mẫu này bằng nội dung thực.)");
+    cbmwItemAppendContent("This is a default clipboard content. Replace it with your actual content. (Vietnamese: Đây là nội dung mẫu. Hãy thay thế nội dung mẫu này bằng nội dung thực.) This is a default clipboard content. Replace it with your actual content. (Vietnamese: Đây là nội dung mẫu. Hãy thay thế nội dung mẫu này bằng nội dung thực.)");
+    cbmwItemAppendContent("This is a default clipboard content. Replace it with your actual content. (Vietnamese: Đây là nội dung mẫu. Hãy thay thế nội dung mẫu này bằng nội dung thực.) This is a default clipboard content. Replace it with your actual content. (Vietnamese: Đây là nội dung mẫu. Hãy thay thế nội dung mẫu này bằng nội dung thực.)");
+    cbmwItemAppendContent("This is a default clipboard content. Replace it with your actual content. (Vietnamese: Đây là nội dung mẫu. Hãy thay thế nội dung mẫu này bằng nội dung thực.) This is a default clipboard content. Replace it with your actual content. (Vietnamese: Đây là nội dung mẫu. Hãy thay thế nội dung mẫu này bằng nội dung thực.)");
+    cbmwItemAppendContent("This is a default clipboard content. Replace it with your actual content. (Vietnamese: Đây là nội dung mẫu. Hãy thay thế nội dung mẫu này bằng nội dung thực.) This is a default clipboard content. Replace it with your actual content. (Vietnamese: Đây là nội dung mẫu. Hãy thay thế nội dung mẫu này bằng nội dung thực.)");
+
+    REP(i, 0, cbmwItemNum){
+        cbmwDrawItemId(i);
+    }
+
+    cbmwItemNum = 8;
+    SDL_SetRenderTarget(cbMainWindow->renderer, cbMainWindow->texture);
+    SDL_Rect scrop = {
+        .y = CBMW_MARGIN_TOP,
+        .x = CBMW_MARGIN_LEFT,
+        .h = CLIPBOARD_HEIGHT - CBMW_MARGIN_TOP - CBMW_MARGIN_BOTTOM,
+        .w = CLIPBOARD_WIDTH  - CBMW_MARGIN_LEFT - CBMW_MARGIN_RIGHT
+    }, dcrop = scrop;
+    SDL_RenderCopy(cbMainWindow->renderer, cbmwTempTexture, &scrop, &dcrop);
     cbmwLoadOffScreen();
-    SDL_Rect item;
-    item = cbmwDrawTextItem(0, "This is a default clipboard content. Replace it with your actual content. (Vietnamese: Đây là nội dung mẫu. Hãy thay thế nội dung mẫu này bằng nội dung thực.) This is a default clipboard content. Replace it with your actual content. (Vietnamese: Đây là nội dung mẫu. Hãy thay thế nội dung mẫu này bằng nội dung thực.)");
-    if(item.w > 0 && item.h > 0)
-    item = cbmwDrawTextItem(item.y+item.h+10, "This is a default clipboard content. Replace it with your actual content. (Vietnamese: Đây là nội dung mẫu. Hãy thay thế nội dung mẫu này bằng nội dung thực.) This is a default clipboard content. Replace it with your actual content. (Vietnamese: Đây là nội dung mẫu. Hãy thay thế nội dung mẫu này bằng nội dung thực.)");
-    if(item.w > 0 && item.h > 0)
-    item = cbmwDrawTextItem(item.y+item.h+10, "This is a default clipboard content.");
-    if(item.w > 0 && item.h > 0)
-    item = cbmwDrawTextItem(item.y+item.h+10, "Replace it with your actual content. (Vietnamese: Đây là nội dung mẫu. Hãy thay thế nội dung mẫu này bằng nội dung thực.) This is a default clipboard content. Replace it with your actual content. (Vietnamese: Đây là nội dung mẫu. Hãy thay thế nội dung mẫu này bằng nội dung thực.)");
-    if(item.w > 0 && item.h > 0)
-    item = cbmwDrawTextItem(item.y+item.h+10, "Đây là nội dung mẫu. Hãy thay thế nội dung mẫu này bằng nội dung thực.) )");
-    if(item.w > 0 && item.h > 0)
-    item = cbmwDrawTextItem(item.y+item.h+10, "This is a default clipboard content. Replace it with your actual content. (Vietnamese: Đây là nội dung mẫu. Hãy thay thế nội dung mẫu này bằng nội dung thực.) This is a default clipboard content. Replace it with your actual content. (Vietnamese: Đây là nội dung mẫu. Hãy thay thế nội dung mẫu này bằng nội dung thực.)");
-    if(item.w > 0 && item.h > 0)
-    item = cbmwDrawTextItem(item.y+item.h+10, "This is a default clipboard content. This is a default clipboard content. Replace it with your actual content. (Vietnamese: Đây là nội dung mẫu. Hãy thay thế nội dung mẫu này bằng nội dung thực.)");
-    if(item.w > 0 && item.h > 0)
-    item = cbmwDrawTextItem(item.y+item.h+10, "This is a default clipboard content. Replace it with your actual content. (Vietnamese: Đây là nội dung mẫu. Hãy thay thế nội dung mẫu này bằng nội dung thực.) This is a default clipboard content. Replace it with your actual content. (Vietnamese: Đây là nội dung mẫu. Hãy thay thế nội dung mẫu này bằng nội dung thực.)");
     cbmwUpdateOnScreen();
+
+    struct timespec ts = {.tv_sec = 0, .tv_nsec = __USEC(500)};
+    while (1){
+        int clickedItemID = cbmwItemClickedFind();
+        if(clickedItemID >= 0) __log("Clicked item-%d", clickedItemID);
+        nanosleep(&ts, NULL);
+    }
+    
 
     __WAIT_FOR_INFINITY__;
 }
@@ -226,6 +209,8 @@ void __processMouseEvent(SDL_Event e){
     switch (e.type){
         case SDL_MOUSEBUTTONUP:
         case SDL_MOUSEBUTTONDOWN:
+            cbmwMouseX = e.button.x;
+            cbmwMouseY = e.button.y;
             if(__isnot_null(wdcts.sub) && e.button.windowID == cbPopup->id){
                 __processMouseEvent_Popup(e);
             }
