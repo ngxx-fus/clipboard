@@ -38,13 +38,18 @@ typedef union systemColor_t{
         cbColor_t error;        /// 6
         cbColor_t warning;      /// 7
         cbColor_t background;   /// 8
+        cbColor_t footer;       /// 9
+        cbColor_t header;       /// 10
     };
-    cbColor_t arr[9];
+    cbColor_t arr[11];
 } systemColor_t;
 
 extern systemColor_t systemColor;
 
 void systemColorCorrectByteOrder(systemColor_t * sysColor);
+void cbColorCorrectByteOrder(cbColor_t *c);
+void cbColorSetRGB(cbColor_t *c, uint32_t rgb);
+void cbColorSetRGBA(cbColor_t *c, uint32_t rgb);
 
 #define splitRGBA(cbColor) cbColor.r, cbColor.g, cbColor.b, cbColor.a
 

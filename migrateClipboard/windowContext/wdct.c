@@ -13,6 +13,7 @@ def __wdctCreateWindow(windowContext_t * wdct){
         wdct->h,
         SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI
     );
+    wdct->id = SDL_GetWindowID(wdct->window);
     if (__is_null(wdct->window)) {
         __err("[__wdctCreateWindow] SDL_CreateWindow failed: %s", SDL_GetError());
         return ERR;
@@ -87,7 +88,7 @@ def __wdctCreateTexture(windowContext_t * wdct){
     wdct->texture = SDL_CreateTexture(
         wdct->renderer,
         SDL_PIXELFORMAT_RGBA8888,
-        SDL_TEXTUREACCESS_STREAMING,
+        SDL_TEXTUREACCESS_TARGET, /// SDL_TEXTUREACCESS_STREAMING,
         wdct->w,
         wdct->h
     );
@@ -118,6 +119,11 @@ def createWindowContext(windowContext_t **wdct, dim_t w, dim_t h, const char *ti
     if (__is_null(wdct)) {
         __err("[createWindowContext] wdct = %p", wdct);
         return ERR_INVALID_ARG;
+    }
+
+    if (__isnot_null(*wdct)){
+        __err("[createWindowContext] Please destroy the current WindowContext before create new one!");
+        return ERR;
     }
 
     __log1("[createWindowContext] Allocate wdct *...");

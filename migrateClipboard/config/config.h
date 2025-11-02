@@ -40,15 +40,16 @@ extern "C" {
 /// ??? ?????? ////////////////////////////////////////////////////////////////////////////////////
 #define CLIPBOARD_WIDTH             640 
 #define CLIPBOARD_HEIGHT            480 
-#define CLIPBOARD_TITLE             " NGXXFUS' CLIPBOARD"
+#define CLIPBOARD_TITLE             " NGXXFUS' CLIPBOARD"  /// AKA HEADER INFO :>
+#define CLIPBOARD_FOOTER_INFO       " ngxxfus (Nguyễn Thanh Phú)  0845939722 󰇮 msnp@outlook.com.vn"
 #define KEYCODE_ESC                 9
 #define KEYCODE_Q                   24
 
 /// ??? ?????? ////////////////////////////////////////////////////////////////////////////////////
 #define FONT_TITLE_PATH         "/usr/share/fonts/NerdFonts/ttf/BitstromWeraNerdFontPropo-Bold.ttf"
 #define FONT_BODY_PATH          "/usr/share/fonts/NerdFonts/ttf/BlexMonoNerdFontPropo-Medium.ttf"
-#define FONT_HEADING0_PATH      "/usr/share/fonts/TTF/Roboto-Bold.ttf"
-#define FONT_HEADING1_PATH      "/usr/share/fonts/TTF/Roboto-Medium.ttf"
+#define FONT_HEADING0_PATH      "/usr/share/fonts/NerdFonts/ttf/0xProtoNerdFontPropo-Regular.ttf"
+#define FONT_HEADING1_PATH      "/usr/share/fonts/NerdFonts/ttf/0xProtoNerdFontPropo-Regular.ttf"
 #define FONT_HEADING2_PATH      "/usr/share/fonts/TTF/Roboto-Regular.ttf"
 #define FONT_HEADING3_PATH      "/usr/share/fonts/TTF/DejaVuSans-Bold.ttf"
 #define FONT_ERROR_PATH         "/usr/share/fonts/TTF/FreeSansBoldOblique.ttf"
@@ -66,22 +67,24 @@ extern "C" {
 #define STYLE_TITLE             (CBF_STYLE_BOLD)
 #define STYLE_BODY              (CBF_STYLE_NORMAL)
 #define STYLE_HEADING0          (CBF_STYLE_BOLD)
-#define STYLE_HEADING1          (CBF_STYLE_BOLD | CBF_STYLE_ITALIC | CBF_STYLE_UNDERLINE)
-#define STYLE_HEADING2          (CBF_STYLE_BOLD | CBF_STYLE_ITALIC)
-#define STYLE_HEADING3          (CBF_STYLE_BOLD | CBF_STYLE_ITALIC)
-#define STYLE_ERROR             (CBF_STYLE_BOLD | CBF_STYLE_UNDERLINE)
+#define STYLE_HEADING1          (CBF_STYLE_BOLD /*| CBF_STYLE_ITALIC | CBF_STYLE_UNDERLINE*/ )
+#define STYLE_HEADING2          (CBF_STYLE_BOLD /*| CBF_STYLE_ITALIC*/)
+#define STYLE_HEADING3          (CBF_STYLE_BOLD /*| CBF_STYLE_ITALIC*/)
+#define STYLE_ERROR             (CBF_STYLE_BOLD /*| CBF_STYLE_ITALIC*/)
 #define STYLE_WARNING           (CBF_STYLE_BOLD)
 
 #define COLOR_RGB_TITLE         016B61
-#define COLOR_RGB_BODY          DDDDDD
-#define COLOR_RGB_HEADING0      FFE97F
-#define COLOR_RGB_HEADING1      7FD4FF
-#define COLOR_RGB_HEADING2      FFAAFF
-#define COLOR_RGB_HEADING2      FFAAFF
-#define COLOR_RGB_HEADING3      C0FFC0
+#define COLOR_RGB_BODY          19183B
+#define COLOR_RGB_HEADING0      37353E
+#define COLOR_RGB_HEADING1      37353E
+#define COLOR_RGB_HEADING2      37353E
+#define COLOR_RGB_HEADING2      37353E
+#define COLOR_RGB_HEADING3      37353E
 #define COLOR_RGB_ERROR         BF092F
 #define COLOR_RGB_WARNING       FFD633
 #define COLOR_RGB_BACKGROUND    FFFFFF
+#define COLOR_RGB_FOOTER        DDDDDD
+#define COLOR_RGB_HEADER        DDDDDD
 
 /// FIXED SECTION | DO NOT CHANGE /////////////////////////////////////////////////////////////////
 
@@ -97,6 +100,8 @@ extern "C" {
 #define COLOR_ERROR             COLOR_RGB2RGBA(COLOR_RGB_ERROR)
 #define COLOR_WARNING           COLOR_RGB2RGBA(COLOR_RGB_WARNING)
 #define COLOR_BACKGROUND        COLOR_RGB2RGBA(COLOR_RGB_BACKGROUND)
+#define COLOR_FOOTER            COLOR_RGB2RGBA(COLOR_RGB_FOOTER)
+#define COLOR_HEADER            COLOR_RGB2RGBA(COLOR_RGB_HEADER)
 
 #define FONT_NORMAL_SIZE        FONT_BODY_SIZE
 #define FONT_NORNAL_PATH        FONT_BODY_PATH

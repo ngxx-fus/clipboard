@@ -21,6 +21,7 @@ typedef struct windowContext_t{
     dim_t                w;
     dim_t                h;
     char                title[MAX_TITLE_SIZE];
+    uint32_t            id;
 }windowContext_t;
 
 /**

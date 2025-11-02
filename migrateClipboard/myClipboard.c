@@ -1,7 +1,10 @@
 #include "include/init.h"
 
 
+
 int main(void) {
+    /// Set-up section ////////////////////////////////////////////////////////////////// 
+
     __SET_SYSTEM_INIT__;
     __entry("main(void)");
 
@@ -19,33 +22,46 @@ int main(void) {
         __MV_2NEXT_INIT_STAGE__;
         nanosleep(&ts_advance, NULL);
     }
-
     __MV_2NEXT_INIT_STAGE__;
-    
 
-    cbmwSetRenderTargetOnScreen();
-    cbmwClearBackground();
-    cbmwDrawTitle();
-    cbmwDrawTextLine(
-        CLIPBOARD_HEIGHT-TTF_FontHeight(systemFont.body.ttf)-5, 
-        CLIPBOARD_WIDTH/7,
-        &systemFont.body, 
-        &systemColor.body, 
-        " ngxxfus (Nguyễn Thanh Phú)  0845939722 󰇮 msnp@outlook.com.vn"
-    );
-    cbmwUpdateOnScreen();
-    windowContext_t * diag;
-    createWindowContext(&diag, 200, 100, "Pop-up");
-    cbmwShowPopup(diag, "Message", "hehehe");
-    destroyWindowContext(&diag);
 
-    /* Render & control screen */
-    struct timespec ts_idle = {.tv_sec = 0, .tv_nsec = 500};
+    /// Main thread /////////////////////////////////////////////////////////////////////
+
+    /* Event routing */
+    SDL_Event e;
+    struct timespec ts_idle = {.tv_sec = 0, .tv_nsec = 100};
     while (!IS_SYSTEM_STOPPED) {
+        while (SDL_PollEvent(&e)) {
+            switch (e.type){
+                case SDL_QUIT:
+                    __log("[main] Event <SDL_QUIT> occured! --> Stop the system!");
+                    __SET_SYSTEM_STOP__;
+                    break;
+                
+                case SDL_KEYUP:
+                case SDL_KEYDOWN:
+                    __processKeyboardEvent(e);
+                    break;
 
+                case SDL_MOUSEBUTTONUP:
+                case SDL_MOUSEBUTTONDOWN:
+                case SDL_MOUSEWHEEL:
+                    __processMouseEvent(e);
+                    break;
 
+                case SDL_WINDOWEVENT:
+                    __processWindowEvent(e);
+                    break;
 
+                default:
+                    if(e.type == CB_POPUP_EVENT){
+                        __processPopupEvent(e);
+                    }
+                    break;
 
+            }
+            nanosleep(&ts_idle, NULL);
+        }
         nanosleep(&ts_idle, NULL);
     }
 

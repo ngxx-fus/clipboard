@@ -14,11 +14,13 @@ systemColor_t systemColor = {
     .heading3.abgr =    COLOR_HEADING3,
     .error.abgr =       COLOR_ERROR,
     .warning.abgr =     COLOR_WARNING,
-    .background.abgr =  COLOR_BACKGROUND
+    .background.abgr =  COLOR_BACKGROUND,
+    .footer.abgr =      COLOR_FOOTER,
+    .header.abgr =      COLOR_HEADER
 };
 
 void systemColorCorrectByteOrder(systemColor_t * sysColor){
-    uint8_t tmpVar = 0, r, g, b, a;
+    uint8_t r, g, b, a;
     #if SDL_BYTEORDER == SDL_LIL_ENDIAN
         REP(i, 0, sizeof(systemColor_t)/sizeof(cbColor_t)){
             
@@ -40,6 +42,46 @@ void systemColorCorrectByteOrder(systemColor_t * sysColor){
         }
     #endif
 }
+
+void cbColorCorrectByteOrder(cbColor_t *c) {
+    #if SDL_BYTEORDER == SDL_LIL_ENDIAN
+        uint8_t r = c->r;
+        uint8_t g = c->g;
+        uint8_t b = c->b;
+        uint8_t a = c->a;
+
+        // Đổi thứ tự: RGBA → ABGR (hoặc tuỳ format bạn đang dùng)
+        c->r = a;
+        c->g = b;
+        c->b = g;
+        c->a = r;
+    #endif
+}
+
+void cbColorSetRGB(cbColor_t *c, uint32_t rgb) {
+    uint8_t r = (rgb >> 16) & 0xFF;
+    uint8_t g = (rgb >> 8)  & 0xFF;
+    uint8_t b = rgb & 0xFF;
+    uint8_t a = 0xFF; // mặc định full alpha
+
+    c->r = r;
+    c->g = g;
+    c->b = b;
+    c->a = a;
+}
+
+void cbColorSetRGBA(cbColor_t *c, uint32_t rgba) {
+    uint8_t a = (rgba >> 24) & 0xFF; 
+    uint8_t r = (rgba >> 16) & 0xFF;
+    uint8_t g = (rgba >> 8)  & 0xFF;
+    uint8_t b = rgba & 0xFF;
+
+    c->r = r;
+    c->g = g;
+    c->b = b;
+    c->a = a;
+}
+
 
 const char *STR_DEFAULT_RETURN_STATUS(enum DEFAULT_RETURN_STATUS ret)
 {
