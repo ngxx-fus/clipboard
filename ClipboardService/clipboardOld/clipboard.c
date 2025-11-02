@@ -112,7 +112,6 @@ void request_targets(xcb_connection_t *c, xcb_window_t win) {
 
 /* Wait up to timeout_us for selection notify events and return reply for property atom if available */
 xcb_get_property_reply_t *wait_for_property(xcb_connection_t *c, xcb_window_t win, int timeout_us) {
-    __entry1("wait_for_property()");
     int waited = 0;
     while (waited < timeout_us) {
         xcb_generic_event_t *ev = xcb_poll_for_event(c);
@@ -127,23 +126,20 @@ xcb_get_property_reply_t *wait_for_property(xcb_connection_t *c, xcb_window_t wi
                 xcb_get_property_cookie_t pk = xcb_get_property(c, 0, win, atom_prop, XCB_ATOM_ANY, 0, UINT32_MAX);
                 xcb_get_property_reply_t *rep = xcb_get_property_reply(c, pk, NULL);
                 free(ev);
-                __exit1("wait_for_property() : %p", rep);
                 return rep;
             }
         }
         free(ev);
     }
-    __exit1("wait_for_property() : NULL");
     return NULL;
 }
 
 /* Poll and handle one clipboard snapshot. Returns 1 if something saved, 0 otherwise */
 int handle_poll_clipboard(xcb_connection_t *c, xcb_window_t win, unsigned int *nextid) {
-    __entry1("handle_poll_clipboard()");
     static uLong last_crc = 0;
     static size_t last_len = 0;
     static xcb_atom_t last_target = XCB_ATOM_NONE;
-    
+
     /* ask for TARGETS */
     request_targets(c, win);
     /* wait up to POLL_MS microseconds for TARGETS reply (~POLL_MS ms) */
@@ -238,23 +234,22 @@ int handle_poll_clipboard(xcb_connection_t *c, xcb_window_t win, unsigned int *n
             }
         }
     }
-    __exit1("handle_poll_clipboard()");
     return saved;
 }
 
 
-int restoreClipboardContent(xcb_connection_t *c, xcb_window_t win, const char *historyPath){
-    __entry("restoreClipboardContent()");
+int restoreClipboardContent(xcb_connection_t *c,
+                            xcb_window_t win,
+                            const char *historyPath)
+{
     if (!historyPath) {
         __err("restoreClipboardContent: NULL path");
-        __exit("restoreClipboardContent() : -1");
         return -1;
     }
 
     const char *ext = strrchr(historyPath, '.');
     if (!ext) {
         __err("restoreClipboardContent: no extension in path %s", historyPath);
-        __exit("restoreClipboardContent() : -1");
         return -1;
     }
 
@@ -263,7 +258,6 @@ int restoreClipboardContent(xcb_connection_t *c, xcb_window_t win, const char *h
         gzFile gz = gzopen(historyPath, "rb");
         if (!gz) {
             __err("gzopen failed for %s", historyPath);
-        __exit("restoreClipboardContent() : -1");
             return -1;
         }
 
@@ -273,7 +267,6 @@ int restoreClipboardContent(xcb_connection_t *c, xcb_window_t win, const char *h
         if (!buf) {
             gzclose(gz);
             __err("malloc failed");
-        __exit("restoreClipboardContent() : -1");
             return -1;
         }
         int n = gzread(gz, buf, cap - 1);
@@ -283,7 +276,6 @@ int restoreClipboardContent(xcb_connection_t *c, xcb_window_t win, const char *h
             __err("gzread error: %s", errmsg);
             free(buf);
             gzclose(gz);
-            __exit("restoreClipboardContent() : -1");
             return -1;
         }
         buf[n] = '\0';
@@ -297,7 +289,6 @@ int restoreClipboardContent(xcb_connection_t *c, xcb_window_t win, const char *h
         __log("Restored TEXT to clipboard from %s", historyPath);
 
         free(buf);
-        __exit("restoreClipboardContent() : 0");
         return 0;
     }
 
@@ -306,7 +297,6 @@ int restoreClipboardContent(xcb_connection_t *c, xcb_window_t win, const char *h
         FILE *f = fopen(historyPath, "rb");
         if (!f) {
             __err("fopen failed for %s", historyPath);
-            __exit("restoreClipboardContent() : -1");
             return -1;
         }
         fseek(f, 0, SEEK_END);
@@ -315,14 +305,12 @@ int restoreClipboardContent(xcb_connection_t *c, xcb_window_t win, const char *h
         if (len <= 0) {
             fclose(f);
             __err("file length invalid %s", historyPath);
-            __exit("restoreClipboardContent() : -1");
             return -1;
         }
         void *buf = malloc(len);
         if (!buf) {
             fclose(f);
             __err("malloc failed");
-            __exit("restoreClipboardContent() : -1");
             return -1;
         }
         fread(buf, 1, len, f);
@@ -337,11 +325,9 @@ int restoreClipboardContent(xcb_connection_t *c, xcb_window_t win, const char *h
         __log("Restored IMAGE (%s) to clipboard from %s", ext+1, historyPath);
 
         free(buf);
-        __exit("restoreClipboardContent() : 0");
         return 0;
     }
 
     __err("restoreClipboardContent: unsupported extension %s", ext);
-    __exit("restoreClipboardContent() : -1");
     return -1;
 }

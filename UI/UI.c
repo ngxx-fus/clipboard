@@ -89,7 +89,7 @@ int readClipboardHistory(char history[HISTORY_SIZE][MAX_PATHNAME_SIZE], int read
 /// @param text The text to be printed in the block
 /// @param color The color
 void drawTextBlock(windowContext_t *wctx, SDL_Rect * outline, const char *text, SDL_Color color){
-    __entry("drawTextBlock(%p, {%d, %d, %d, %d}, \"%s\", {%d, %d, %d, %d})", wctx, outline->x, outline->y, outline->h, outline->w, text, color.r, color.g, color.b, color.a);
+    __entry1("drawTextBlock(%p, {%d, %d, %d, %d}, \"%s\", {%d, %d, %d, %d})", wctx, outline->x, outline->y, outline->h, outline->w, text, color.r, color.g, color.b, color.a);
     /// Set target of Renderer to the temp 
     int fontH = TTF_FontHeight(wctx->font);
     int lineSkip = TTF_FontLineSkip(wctx->font);
@@ -100,7 +100,7 @@ void drawTextBlock(windowContext_t *wctx, SDL_Rect * outline, const char *text, 
         __err("TTF_RenderText_Blended failed: %s\n", TTF_GetError());
         return;
     }
-    __log("[drawTextBlock] surface_WxH=%dx%d", surface->w, surface->h);
+    __log1("[drawTextBlock] surface_WxH=%dx%d", surface->w, surface->h);
     SDL_Rect src = { .y = 0, .y = 0, .h = surface->h, .w = surface->w };
     SDL_Rect dst = *outline;
     SDL_Rect out = *outline;
@@ -141,7 +141,7 @@ void drawTextBlock(windowContext_t *wctx, SDL_Rect * outline, const char *text, 
 
     SDL_DestroyTexture(texture);
     SDL_FreeSurface(surface);
-    __exit("drawTextBlock");
+    __exit1("drawTextBlock");
 }
 
 void drawText(SDL_Renderer *renderer, TTF_Font *font, 

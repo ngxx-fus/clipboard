@@ -1,4 +1,4 @@
-#include "clipboard.h"
+#include "clipboardManager.h"
 
 xcb_atom_t atom_clipboard = XCB_ATOM_NONE;
 xcb_atom_t atom_utf8 = XCB_ATOM_NONE;
@@ -112,7 +112,7 @@ void request_targets(xcb_connection_t *c, xcb_window_t win) {
 
 /* Wait up to timeout_us for selection notify events and return reply for property atom if available */
 xcb_get_property_reply_t *wait_for_property(xcb_connection_t *c, xcb_window_t win, int timeout_us) {
-    __entry1("wait_for_property()");
+    __entry2("wait_for_property()");
     int waited = 0;
     while (waited < timeout_us) {
         xcb_generic_event_t *ev = xcb_poll_for_event(c);
@@ -127,19 +127,19 @@ xcb_get_property_reply_t *wait_for_property(xcb_connection_t *c, xcb_window_t wi
                 xcb_get_property_cookie_t pk = xcb_get_property(c, 0, win, atom_prop, XCB_ATOM_ANY, 0, UINT32_MAX);
                 xcb_get_property_reply_t *rep = xcb_get_property_reply(c, pk, NULL);
                 free(ev);
-                __exit1("wait_for_property() : %p", rep);
+                __exit2("wait_for_property() : %p", rep);
                 return rep;
             }
         }
         free(ev);
     }
-    __exit1("wait_for_property() : NULL");
+    __exit2("wait_for_property() : NULL");
     return NULL;
 }
 
 /* Poll and handle one clipboard snapshot. Returns 1 if something saved, 0 otherwise */
 int handle_poll_clipboard(xcb_connection_t *c, xcb_window_t win, unsigned int *nextid) {
-    __entry1("handle_poll_clipboard()");
+    __entry2("handle_poll_clipboard()");
     static uLong last_crc = 0;
     static size_t last_len = 0;
     static xcb_atom_t last_target = XCB_ATOM_NONE;
@@ -238,7 +238,7 @@ int handle_poll_clipboard(xcb_connection_t *c, xcb_window_t win, unsigned int *n
             }
         }
     }
-    __exit1("handle_poll_clipboard()");
+    __exit2("handle_poll_clipboard()");
     return saved;
 }
 

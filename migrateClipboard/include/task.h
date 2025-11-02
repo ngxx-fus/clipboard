@@ -1,44 +1,24 @@
-#include "global.h"
-#include "helper/helper.h"
-#include "log/log.h"
-#include "clipboard/clipboard.h"
-#include "UI/UI.h"
-
-#include <pthread.h>
-
-// void* clipboardControlService(void* pv){
-//     __entry("clipboardControlService(%p)", pv);
-
-//     while(hasFlag(systemStatusFlag, SYS_RUNNING)){
-//         entryCriticalSection(&clickedClipboardIDMutexLock);
-//         if(currentHistoryIndex > 0){
-
-//         }
-//         exitCriticalSection(&clickedClipboardIDMutexLock);
-
-//         SDL_Delay(100);
-//     }
-
-//     __exit("clipboardControlService");
-// }
+#include "globalDef.h"
 
 void* clipboardCaptureService(void* pv){
+    __WAIT_FOR_(SYSTEM_INIT_L1);
     __entry("clipboardCaptureService(%p)", pv);
-
+    
     if (ensure_dirs() != 0) return NULL;
-
+    
     int screen_num;
     xcb_connection_t *c = xcb_connect(NULL, &screen_num);
     if (xcb_connection_has_error(c)) {
-        fprintf(stderr, "Cannot connect to X server\n");
+        __err("[clipboardCaptureService] Cannot connect to X server");
+        __exit("clipboardCaptureService() : NULL");
         return NULL;
     }
-
+    
     const xcb_setup_t *setup = xcb_get_setup(c);
     xcb_screen_iterator_t iter = xcb_setup_roots_iterator(setup);
     for (int i = 0; i < screen_num; ++i) xcb_screen_next(&iter);
     xcb_screen_t *screen = iter.data;
-
+    
     /* input-only window to receive SelectionNotify */
     xcb_window_t win = xcb_generate_id(c);
     xcb_create_window(c, XCB_COPY_FROM_PARENT, win, screen->root, 0, 0, 1, 1, 0,
@@ -56,25 +36,27 @@ void* clipboardCaptureService(void* pv){
 
     unsigned int nextid = read_nextid();
 
+    // __WAIT_FOR_INIT__;
+    
     __log("clipboard watcher started (poll %d ms), history %s, images %s\n", POLL_MS, HISTORY_FILE, IMG_DIR);
 
-    while (hasFlag(systemStatusFlag, SYS_RUNNING)) {
+    while (!IS_SYSTEM_STOPPED) {
         int saved = handle_poll_clipboard(c, win, &nextid);
         (void)saved;
 
-        if(hasFlag(uiStatusFlag, CB_MOUSE_CLICKED)){
+        if(__hasFlagBitSet(uiStatusFlag, CB_MOUSE_CLICKED)){
 
-            entryCriticalSection(&uiFlagMutexLock);
-            clrFlag(uiStatusFlag, CB_MOUSE_CLICKED);
-            exitCriticalSection(&uiFlagMutexLock);
+            __entryCriticalSection(&cbFlagMutexLock);
+            __clearFlagBit(uiStatusFlag, CB_MOUSE_CLICKED);
+            __exitCriticalSection(&cbFlagMutexLock);
 
             __log("[clipboardCaptureService] Looking for cbBlock...");
             
-            for(int i = 0; i < clickedClipboardNum; ++i){
+            for(int i = 0; i < cbClickedClipboardNum; ++i){
                 // if( cbba[i].row  )
                 __log(
                     "[clipboardCaptureService] Block %d : [r0:%d r1:%d c0:%d c1:%d] <-- [Y:%d, X:%d]", 
-                    i + currentHistoryIndex,
+                    i + cbCurrentHistoryIndex,
                     cbba[i].row, 
                     cbba[i].row + cbba[i].h,
                     cbba[i].col,
@@ -88,8 +70,8 @@ void* clipboardCaptureService(void* pv){
                     cbba[i].col <= cbClickedMouseInfo.mouseX &&
                     cbClickedMouseInfo.mouseY < cbba[i].col + cbba[i].w
                 ){
-                    __log("[clipboardCaptureService] Restore: %s", historyList[currentHistoryIndex + i]);
-                    restoreClipboardContent(c, win, historyList[currentHistoryIndex + i]);
+                    __log("[clipboardCaptureService] Restore: %s", historyPathFileList[cbCurrentHistoryIndex + i]);
+                    restoreClipboardContent(c, win, historyPathFileList[cbCurrentHistoryIndex + i]);
                     break;
                 }
             }
@@ -102,20 +84,79 @@ void* clipboardCaptureService(void* pv){
 
     xcb_disconnect(c);
 
-    __exit("clipboardCaptureService()");
+    __exit("clipboardCaptureService() : NULL");
     return NULL;
 }
 
+void* clipboardManageService(void* pv){
+    __WAIT_FOR_(SYSTEM_INIT_L2);
+    __entry("clipboardManageService(%p)", pv);
+
+    ////
+    
+    size_t i = 0;
+    size_t historyItemNum = readClipboardHistory(historyPathFileList, HISTORY_SIZE);
+    renderHistory(cbMainWindow, cbba, i);
+
+    cbmwSetRenderTargetOnScreen();
+    cbmwClearBackground();
+    cbmwDrawTitle();
+    cbmwUpdateOnScreen();
+
+
+    
+    __WAIT_FOR_INFINITY__;
+    //// 
+
+    /*
+    int index = 0;
+    int itemNum = 1;
+    itemNum = readClipboardHistory(historyPathFileList, HISTORY_SIZE);
+    renderHistory(cbMainWindow, cbba, index);
+    while(!IS_SYSTEM_STOPPED) {
+        if(__hasFlagBitSet(uiStatusFlag, CB_SCROLL_DOWN)){
+            __entryCriticalSection(&cbFlagMutexLock);
+            __clearFlagBit(uiStatusFlag, CB_SCROLL_DOWN);
+            __exitCriticalSection(&cbFlagMutexLock);
+
+            index = (index + 1) % itemNum;
+            renderHistory(cbMainWindow, cbba, index);
+        }
+        if(__hasFlagBitSet(uiStatusFlag, CB_SCROLL_UP)){
+            __entryCriticalSection(&cbFlagMutexLock);
+            __clearFlagBit(uiStatusFlag, CB_SCROLL_UP);
+            __exitCriticalSection(&cbFlagMutexLock);
+
+            index = (index - 1 + itemNum) % itemNum;
+            renderHistory(cbMainWindow, cbba, index);
+        }
+        if(__hasFlagBitSet(uiStatusFlag, CB_RELOAD)){
+            __entryCriticalSection(&cbFlagMutexLock);
+            __clearFlagBit(uiStatusFlag, CB_RELOAD);
+            __exitCriticalSection(&cbFlagMutexLock);
+
+            itemNum = readClipboardHistory(historyPathFileList, HISTORY_SIZE);
+            renderHistory(cbMainWindow, cbba, index);
+        }
+        __sleep_us(100);
+    }
+    */
+
+    __exit("clipboardManageService() : NULL");
+    return NULL;
+} 
+
 void* keyboardCaptureService(void* pv){
+    __WAIT_FOR_(SYSTEM_INIT_L1);
     __entry("keyboardCaptureService()");
     SDL_Event e;
-    while(hasFlag(systemStatusFlag, SYS_RUNNING)){
+    while(!IS_SYSTEM_STOPPED){
         while (SDL_PollEvent(&e)) {
             switch (e.type)
             {
                 case SDL_QUIT:
-                    __log("Event <SDL_QUIT> occured!");
-                    clrFlag(systemStatusFlag, SYS_RUNNING);
+                    __log("Event <SDL_QUIT> occured! --> Stop the system!");
+                    __SET_SYSTEM_STOP__;
                     break;
                     
                 case SDL_MOUSEBUTTONDOWN:
@@ -125,48 +166,48 @@ void* keyboardCaptureService(void* pv){
                         __log("Mouse down at (%d, %d)\n", mouseX, mouseY);
                         cbClickedMouseInfo.mouseX = mouseX;
                         cbClickedMouseInfo.mouseY = mouseY;
-                        entryCriticalSection(&uiFlagMutexLock);
-                        setFlag(uiStatusFlag, CB_MOUSE_CLICKED);
-                        exitCriticalSection(&uiFlagMutexLock);
+                        __entryCriticalSection(&cbFlagMutexLock);
+                        __setFlagBit(uiStatusFlag, CB_MOUSE_CLICKED);
+                        __exitCriticalSection(&cbFlagMutexLock);
                     }
                     break;
 
                 case SDL_MOUSEWHEEL:
                     if (e.wheel.y > 0) {
                         __log("Mouse wheel UP");
-                        entryCriticalSection(&uiFlagMutexLock);
-                        setFlag(uiStatusFlag, CB_SCROLL_UP);
-                        exitCriticalSection(&uiFlagMutexLock);
+                        __entryCriticalSection(&cbFlagMutexLock);
+                        __setFlagBit(uiStatusFlag, CB_SCROLL_UP);
+                        __exitCriticalSection(&cbFlagMutexLock);
                     } else if (e.wheel.y < 0) {
                         __log("Mouse wheel DOWN");
-                        entryCriticalSection(&uiFlagMutexLock);
-                        setFlag(uiStatusFlag, CB_SCROLL_DOWN);
-                        exitCriticalSection(&uiFlagMutexLock);
+                        __entryCriticalSection(&cbFlagMutexLock);
+                        __setFlagBit(uiStatusFlag, CB_SCROLL_DOWN);
+                        __exitCriticalSection(&cbFlagMutexLock);
                     }
                     break;
                 case SDL_KEYDOWN:
                     if (e.key.keysym.sym == SDLK_q) {
                         __log("Event: <SDLK_q> is pressed!");
-                        clrFlag(systemStatusFlag, SYS_RUNNING);
+                        __SET_SYSTEM_STOP__;
                     }
                     else if(e.key.keysym.sym == SDLK_c){
                         __log("Event <SDL_KEYDOWN | SDLK_c> occured!");
                     }
                     else if(e.key.keysym.sym == SDLK_r){
                         __log("Event <SDL_KEYDOWN | SDLK_r> occured!");
-                        setFlag(uiStatusFlag, CB_RELOAD);
+                        __setFlagBit(uiStatusFlag, CB_RELOAD);
                     }
                     else if(e.key.keysym.sym == SDLK_w){
                         __log("Event <SDL_KEYDOWN | SDLK_w> occured!");
-                        entryCriticalSection(&uiFlagMutexLock);
-                        setFlag(uiStatusFlag, CB_SCROLL_UP);
-                        exitCriticalSection(&uiFlagMutexLock);
+                        __entryCriticalSection(&cbFlagMutexLock);
+                        __setFlagBit(uiStatusFlag, CB_SCROLL_UP);
+                        __exitCriticalSection(&cbFlagMutexLock);
                     }
                     else if(e.key.keysym.sym == SDLK_s){
                         __log("Event <SDL_KEYDOWN | SDLK_s> occured!");
-                        entryCriticalSection(&uiFlagMutexLock);
-                        setFlag(uiStatusFlag, CB_SCROLL_DOWN);
-                        exitCriticalSection(&uiFlagMutexLock);
+                        __entryCriticalSection(&cbFlagMutexLock);
+                        __setFlagBit(uiStatusFlag, CB_SCROLL_DOWN);
+                        __exitCriticalSection(&cbFlagMutexLock);
                     }
                     // else if(SDLK_0 <= e.key.keysym.sym && e.key.keysym.sym <= SDLK_9){
                     //     uint8_t i = e.key.keysym.sym - SDLK_0;
@@ -186,3 +227,5 @@ void* keyboardCaptureService(void* pv){
     __exit("keyboardCaptureService()");
     return NULL;
 }
+
+

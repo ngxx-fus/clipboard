@@ -24,13 +24,47 @@ void __exitCriticalSection(pthread_mutex_t* mutex);
 void __coreLog(const char* tag, const char* format, ...)
     __attribute__((format(printf, 2, 3)));
 
-#define CB_LOG_L0_EN            1
-#define CB_LOG_L1_EN            0
-#define CB_LOG_ERR_EN           1
-#define CB_LOG_L0_ENTRY         1
-#define CB_LOG_L0_EXIT          1
-#define CB_LOG_L1_ENTRY         0
-#define CB_LOG_L1_EXIT          0
+#if 1   /// Log config
+    #ifndef CB_LOG_L0_EN
+    #define CB_LOG_L0_EN            1
+    #endif
+
+    #ifndef CB_LOG_L1_EN
+    #define CB_LOG_L1_EN            0
+    #endif
+
+    #ifndef CB_LOG_L2_EN
+    #define CB_LOG_L2_EN            0
+    #endif
+
+    #ifndef CB_LOG_ERR_EN
+    #define CB_LOG_ERR_EN           1
+    #endif
+
+    #ifndef CB_LOG_L0_ENTRY
+    #define CB_LOG_L0_ENTRY         1
+    #endif
+
+    #ifndef CB_LOG_L0_EXIT
+    #define CB_LOG_L0_EXIT          1
+    #endif
+
+    #ifndef CB_LOG_L1_ENTRY
+    #define CB_LOG_L1_ENTRY         0
+    #endif
+
+    #ifndef CB_LOG_L1_EXIT
+    #define CB_LOG_L1_EXIT          0
+    #endif
+
+    #ifndef CB_LOG_L2_ENTRY
+    #define CB_LOG_L2_ENTRY         0
+    #endif
+
+    #ifndef CB_LOG_L2_EXIT
+    #define CB_LOG_L2_EXIT          0
+    #endif
+#endif
 
 #if (CB_LOG_L0_EN == 1)
     #define __log(...)   __coreLog("log",  __VA_ARGS__)
@@ -42,6 +76,12 @@ void __coreLog(const char* tag, const char* format, ...)
     #define __log1(...)   __coreLog("log",  __VA_ARGS__)
 #else
     #define __log1(...)
+#endif
+
+#if (CB_LOG_L2_EN == 1)
+    #define __log2(...)   __coreLog("log",  __VA_ARGS__)
+#else
+    #define __log2(...)
 #endif
 
 #if (CB_LOG_ERR_EN == 1)
@@ -72,6 +112,18 @@ void __coreLog(const char* tag, const char* format, ...)
     #define __exit1(...)  __coreLog("<<<",  __VA_ARGS__)
 #else
     #define __exit1(...)
+#endif
+
+#if (CB_LOG_L2_ENTRY == 1)
+    #define __entry1(...) __coreLog(">>>",  __VA_ARGS__)
+#else
+    #define __entry2(...)
+#endif
+
+#if (CB_LOG_L2_EXIT == 1)
+    #define __exit2(...)  __coreLog("<<<",  __VA_ARGS__)
+#else
+    #define __exit2(...)
 #endif
 
 

@@ -26,27 +26,10 @@ typedef uint64_t                    flag;
 #define clrFlag(flagReg, flag)      ((flagReg) &= (~(1ULL<<(flag)))) 
 #define hasFlag(flagReg, flag)      ((flagReg) & (1ULL<<(flag)))
 
-enum FLAG_BITORDER{
+enum SYSTEM_STAGE_FLAG_BITORDER{
     SYS_RUNNING = 0,
 };
 
-extern uint64_t systemStatusFlag;
-
-#define entryCriticalSection(mutex) do {                                   \
-    int __rc = pthread_mutex_lock(mutex);                                  \
-    if (__rc != 0) {                                                       \
-        fprintf(stderr, "[CRITICAL ERROR] pthread_mutex_lock failed: %s\n",\
-                strerror(__rc));                                           \
-    }                                                                      \
-} while(0)
-
-#define exitCriticalSection(mutex) do {                                    \
-    int __rc = pthread_mutex_unlock(mutex);                                \
-    if (__rc != 0) {                                                       \
-        fprintf(stderr, "[CRITICAL ERROR] pthread_mutex_unlock failed: %s\n",\
-                strerror(__rc));                                           \
-    }                                                                      \
-} while(0)
 
 
 #endif

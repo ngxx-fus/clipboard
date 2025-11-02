@@ -1,0 +1,133 @@
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/usr/lib64/libthread_db.so.1".
+[14:21:47.215055] [log] [stage] 00 → 00
+[14:21:47.215174] [>>>] main(void)
+[14:21:47.215181] [>>>] myClipboardInit()
+[14:21:47.215185] [log] [myClipboardInit] Init SDL...
+[Detaching after fork from child process 19458]
+[14:21:47.258508] [log] [myClipboardInit] Init TTF...
+[14:21:47.258605] [log] [myClipboardInit] Load system fonts...
+[14:21:47.258612] [>>>] cbSelfLoad(0x555555561360)
+[14:21:47.258849] [<<<] cbSelfLoad() : OKE
+[14:21:47.258858] [>>>] cbSelfLoad(0x555555561478)
+[14:21:47.259056] [<<<] cbSelfLoad() : OKE
+[14:21:47.259064] [>>>] cbSelfLoad(0x555555561590)
+[14:21:47.259223] [<<<] cbSelfLoad() : OKE
+[14:21:47.259231] [>>>] cbSelfLoad(0x5555555616a8)
+[14:21:47.259395] [<<<] cbSelfLoad() : OKE
+[14:21:47.259403] [>>>] cbSelfLoad(0x5555555617c0)
+[14:21:47.259615] [<<<] cbSelfLoad() : OKE
+[14:21:47.259624] [>>>] cbSelfLoad(0x5555555618d8)
+[14:21:47.259796] [<<<] cbSelfLoad() : OKE
+[14:21:47.259826] [>>>] cbSelfLoad(0x5555555619f0)
+[14:21:47.259976] [<<<] cbSelfLoad() : OKE
+[14:21:47.259984] [log] [myClipboardInit] Setup main window [480x640]
+[14:21:47.259988] [>>>] createWindowContext(0x5555555716a8, 640, 480,  NGXXFUS' CLIPBOARD)
+[14:21:47.259991] [log] [createWindowContext] Check __is_null(wdct)
+[14:21:47.259993] [log] [createWindowContext] Allocate wdct *...
+[14:21:47.260002] [log] [createWindowContext] Preset *wdct
+[14:21:47.260006] [log] [createWindowContext] Create Windows (>>> __wdctCreateWindow)
+[14:21:47.264865] [log] [createWindowContext] Create Renderer (>>> __wdctCreateRenderer)
+[14:21:47.264909] [>>>] __wdctCreateRenderer(0x555555659150)
+[14:21:47.264915] [log] [__wdctCreateRenderer] SDL_CreateRenderer
+[New Thread 0x7fffe94be6c0 (LWP 19476)]
+[New Thread 0x7fffe8cbd6c0 (LWP 19477)]
+[New Thread 0x7fffe3fff6c0 (LWP 19478)]
+[New Thread 0x7fffe37fe6c0 (LWP 19479)]
+[Thread 0x7fffe37fe6c0 (LWP 19479) exited]
+[Thread 0x7fffe3fff6c0 (LWP 19478) exited]
+[New Thread 0x7fffe3fff6c0 (LWP 19480)]
+[New Thread 0x7fffe37fe6c0 (LWP 19481)]
+[14:21:47.606201] [<<<] __wdctCreateRenderer(): OKE
+[14:21:47.606229] [log] [createWindowContext] Create Texture (>>> __wdctCreateTexture)
+[14:21:47.607106] [<<<] createWindowContext()
+[14:21:47.607126] [log] [myClipboardInit] [+task] clipboardCaptureDaemon
+[New Thread 0x7fffe2ffd6c0 (LWP 19482)]
+[14:21:47.607585] [log] [stage] Waiting for stage >= 1...
+[14:21:47.607592] [log] [myClipboardInit] [+task] keyboardDaemon
+[New Thread 0x7fffe27fc6c0 (LWP 19483)]
+[14:21:47.607963] [log] [stage] Waiting for stage >= 1...
+[14:21:47.607963] [<<<] myClipboardInit()
+[14:21:47.607983] [log] [stage] 00 → 11
+[14:21:47.607987] [log] [stage] Already >= SYSTEM_RUNNING (cur=11)
+[14:21:47.607997] [log] [stage] Reached stage 11
+[14:21:47.608003] [>>>] clipboardCaptureService((nil))
+[14:21:47.608006] [>>>] ensure_dirs()
+[14:21:47.608022] [<<<] ensure_dirs(): 0
+[14:21:47.608056] [log] [stage] Reached stage 11
+[14:21:47.608067] [>>>] keyboardCaptureService()
+[14:21:47.608227] [>>>] get_atom(name=CLIPBOARD)
+[14:21:47.608365] [<<<] get_atom(): 459
+[14:21:47.608392] [>>>] get_atom(name=UTF8_STRING)
+[14:21:47.608446] [<<<] get_atom(): 393
+[14:21:47.608456] [>>>] get_atom(name=TARGETS)
+[14:21:47.608507] [<<<] get_atom(): 460
+[14:21:47.608533] [>>>] get_atom(name=image/png)
+[14:21:47.608578] [<<<] get_atom(): 617
+[14:21:47.608585] [>>>] get_atom(name=image/jpeg)
+[14:21:47.608612] [<<<] get_atom(): 1079
+[14:21:47.608618] [>>>] get_atom(name=CB_XCB_PROP_1)
+[14:21:47.608650] [<<<] get_atom(): 1250
+[14:21:47.608655] [>>>] read_nextid()
+[14:21:47.608688] [<<<] read_nextid(): Done 160
+[14:21:47.608695] [log] clipboard watcher started (poll 200 ms), history /tmp/clipboard/history, images /tmp/clipboard/imgs
+
+[14:21:47.614275] [>>>] createWindowContext(0x7fffffffd840, 200, 100, Pop-up)
+[14:21:47.614308] [log] [createWindowContext] Check __is_null(wdct)
+[14:21:47.614312] [log] [createWindowContext] Allocate wdct *...
+[14:21:47.614336] [log] [createWindowContext] Preset *wdct
+[14:21:47.614338] [log] [createWindowContext] Create Windows (>>> __wdctCreateWindow)
+[14:21:47.617167] [log] [createWindowContext] Create Renderer (>>> __wdctCreateRenderer)
+[14:21:47.617185] [>>>] __wdctCreateRenderer(0x555556671250)
+[14:21:47.617190] [log] [__wdctCreateRenderer] SDL_CreateRenderer
+[14:21:47.622573] [>>>] build_data_filename(id=160, datatype=text, ext=txt.gz)
+[14:21:47.622632] [log] [build_data_filename] Done: /tmp/clipboard/historydata_01
+[14:21:47.622639] [<<<] build_data_filename()
+[14:21:47.622644] [>>>] unlink_if_exists(path=/tmp/clipboard/historydata_01)
+[14:21:47.622701] [<<<] unlink_if_exists()
+[14:21:47.622710] [>>>] save_text_gzip(path=/tmp/clipboard/historydata_01, len=1364)
+[14:21:47.623040] [<<<] save_text_gzip(): 0
+[14:21:47.623056] [>>>] append_history_path(path=/tmp/clipboard/historydata_01)
+[14:21:47.623082] [<<<] append_history_path(): 0
+[14:21:47.623088] [>>>] write_nextid(161)
+[14:21:47.623130] [<<<] write_nextid()
+[New Thread 0x7fffe1bbb6c0 (LWP 19487)]
+[New Thread 0x7fffe13ba6c0 (LWP 19490)]
+[14:21:47.643689] [<<<] __wdctCreateRenderer(): OKE
+[14:21:47.643709] [log] [createWindowContext] Create Texture (>>> __wdctCreateTexture)
+[14:21:47.644012] [<<<] createWindowContext()
+[14:21:50.644085] [>>>] destroyWindowContext(0x555556671250)
+[Thread 0x7fffe13ba6c0 (LWP 19490) exited]
+[Thread 0x7fffe1bbb6c0 (LWP 19487) exited]
+[14:21:50.648574] [<<<] destroyWindowContext()
+[14:21:53.679794] [log] Event: <SDLK_q> is pressed!
+[14:21:53.679814] [log] [stage] 11 → 12
+[14:21:53.679821] [<<<] keyboardCaptureService()
+[14:21:53.679829] [<<<] main(void)
+[Thread 0x7fffe27fc6c0 (LWP 19483) exited]
+[Thread 0x7fffe37fe6c0 (LWP 19481) exited]
+[Thread 0x7fffe3fff6c0 (LWP 19480) exited]
+[Thread 0x7fffe8cbd6c0 (LWP 19477) exited]
+[Thread 0x7fffe94be6c0 (LWP 19476) exited]
+[14:21:53.684296] [>>>] myClipboardExit()
+[14:21:53.684325] [>>>] cbDeleteFont(0x555555561360)
+[14:21:53.687199] [<<<] cbDeleteFont() : OKE
+[14:21:53.687219] [>>>] cbDeleteFont(0x555555561478)
+[14:21:53.687286] [<<<] cbDeleteFont() : OKE
+[14:21:53.687290] [>>>] cbDeleteFont(0x555555561590)
+[14:21:53.687303] [<<<] cbDeleteFont() : OKE
+[14:21:53.687306] [>>>] cbDeleteFont(0x5555555616a8)
+[14:21:53.687317] [<<<] cbDeleteFont() : OKE
+[14:21:53.687320] [>>>] cbDeleteFont(0x5555555617c0)
+[14:21:53.687331] [<<<] cbDeleteFont() : OKE
+[14:21:53.687334] [>>>] cbDeleteFont(0x5555555618d8)
+[14:21:53.687343] [<<<] cbDeleteFont() : OKE
+[14:21:53.687347] [>>>] cbDeleteFont(0x5555555619f0)
+[14:21:53.687357] [<<<] cbDeleteFont() : OKE
+[14:21:53.687360] [>>>] destroyWindowContext(0x555555659150)
+[14:21:53.690173] [<<<] destroyWindowContext()
+[Thread 0x7ffff7012040 (LWP 19455) exited]
+[Thread 0x7fffe2ffd6c0 (LWP 19482) exited]
+[New process 19455]
+[Inferior 1 (process 19455) exited normally]
+No stack.
