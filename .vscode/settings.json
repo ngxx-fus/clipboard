@@ -1,5 +1,6 @@
 {
     "files.associations": {
+        "*.h": "c",
         "ui.h": "c",
         "clipboardmanager.h": "c",
         "general.h": "c",
@@ -26,6 +27,8 @@
         "task.h": "c",
         "stdint.h": "c",
         "arithmetic.h": "c",
-        "numbers": "c"
-    }
+        "numbers": "c",
+        "random": "c"
+    },
+    "C_Cpp.errorSquiggles": "disabled"
 }

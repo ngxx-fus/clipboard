@@ -1,5 +1,11 @@
 #include "globalDef.h"
 
+int64_t nsGetTime(void) {
+    struct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+    return (int64_t)ts.tv_sec * 1000000000LL + ts.tv_nsec;
+}
+
 void* clipboardCaptureService(void* pv){
     __WAIT_FOR_(SYSTEM_INIT_L1);
     __entry("clipboardCaptureService(%p)", pv);
@@ -39,12 +45,22 @@ void* clipboardCaptureService(void* pv){
     // __WAIT_FOR_INIT__;
     
     __log("clipboard watcher started (poll %d ms), history %s, images %s\n", POLL_MS, HISTORY_FILE, IMG_DIR);
-
+    
+    int64_t lastRecTime = nsGetTime(), curRecTime = lastRecTime;
+    struct timespec ts = {.tv_sec = 0, .tv_nsec = __USEC(10)};
     while (!IS_SYSTEM_STOPPED) {
         int saved = handle_poll_clipboard(c, win, &nextid);
         (void)saved;
 
         /* sleep POLL_MS ms */
+        while(1) {
+            curRecTime = nsGetTime();
+            if( curRecTime > lastRecTime + __MSEC(POLL_MS)){
+                break;
+            }else{
+                nanosleep(&ts, NULL);
+            }
+        }
         usleep(POLL_MS * 1000);
     }
 
@@ -54,88 +70,20 @@ void* clipboardCaptureService(void* pv){
     return NULL;
 }
 
-void* cbTestThread(void* pv){
-    __WAIT_FOR_INIT__;
-
-    CBPU_SET_TITLE("Message from ngxxfus");
-    CBPU_SET_MESSAGE("This is a demo version. Use it at your own risk — I am not responsible for any issues that may occur! (Vietnamese: Đây là phiên bản thử nghiệm! Hãy cẩn thận khi sử dụng — tôi không chịu trách nhiệm nếu xảy ra sự cố.)");
-    cbpuPushEvent(CBPU_EVENT_SHOW_YESNO, NULL, NULL);
-    __log("[cbTestThread] sizeof(₍₍⚞(˶˃ ꒳ ˂˶)⚟⁾⁾) = %d", sizeof("₍₍⚞(˶˃ ꒳ ˂˶)⚟⁾⁾"));
-
-    flag_t clickedNo    = __flagMask(UI_FLAG_POPUP_CLICKED_NO);
-    flag_t clickedYes   = __flagMask(UI_FLAG_POPUP_CLICKED_YES);
-    flag_t clickedClose = __flagMask(UI_FLAG_POPUP_CLICKED_CLOSE);
-    flag_t currentState = 0;
-    do{
-        currentState = __uiFlagGetFull();
-        if(currentState & clickedYes){
-            __uiFlagClr(UI_FLAG_POPUP_CLICKED_YES);
-            appAgreement = 0xAC;
-            break;
-        }
-        if(currentState & clickedNo){
-            __uiFlagClr(UI_FLAG_POPUP_CLICKED_NO);
-            CBPU_SET_MESSAGE("Closing...");
-            cbpuPushEvent(CBPU_EVENT_SHOW_MSG, NULL, NULL);
-            sleep(1);            
-            __SET_SYSTEM_STOP__;
-        }
-        __sleep_ns(1000);
-    }while(1);
-
-    SDL_SetRenderTarget(cbMainWindow->renderer, cbmwTempTexture);
-    cbmwClearBackground();
-
-    cbmwItemAppendContent("This is a default clipboard content. Replace it with your actual content. (Vietnamese: Đây là nội dung mẫu. Hãy thay thế nội dung mẫu này bằng nội dung thực.) This is a default clipboard content. Replace it with your actual content. (Vietnamese: Đây là nội dung mẫu. Hãy thay thế nội dung mẫu này bằng nội dung thực.)");
-    cbmwItemAppendContent("This is a default clipboard content. Replace it with your actual content. (Vietnamese: Đây là nội dung mẫu. Hãy thay thế nội dung mẫu này bằng nội dung thực.) This is a default clipboard content. Replace it with your actual content. (Vietnamese: Đây là nội dung mẫu. Hãy thay thế nội dung mẫu này bằng nội dung thực.)");
-    cbmwItemAppendContent("This is a default clipboard content. Replace it with your actual content. (Vietnamese: Đây là nội dung mẫu. Hãy thay thế nội dung mẫu này bằng nội dung thực.) This is a default clipboard content. Replace it with your actual content. (Vietnamese: Đây là nội dung mẫu. Hãy thay thế nội dung mẫu này bằng nội dung thực.)");
-    cbmwItemAppendContent("This is a default clipboard content. Replace it with your actual content. (Vietnamese: Đây là nội dung mẫu. Hãy thay thế nội dung mẫu này bằng nội dung thực.) This is a default clipboard content. Replace it with your actual content. (Vietnamese: Đây là nội dung mẫu. Hãy thay thế nội dung mẫu này bằng nội dung thực.)");
-    cbmwItemAppendContent("This is a default clipboard content. Replace it with your actual content. (Vietnamese: Đây là nội dung mẫu. Hãy thay thế nội dung mẫu này bằng nội dung thực.) This is a default clipboard content. Replace it with your actual content. (Vietnamese: Đây là nội dung mẫu. Hãy thay thế nội dung mẫu này bằng nội dung thực.)");
-    cbmwItemAppendContent("This is a default clipboard content. Replace it with your actual content. (Vietnamese: Đây là nội dung mẫu. Hãy thay thế nội dung mẫu này bằng nội dung thực.) This is a default clipboard content. Replace it with your actual content. (Vietnamese: Đây là nội dung mẫu. Hãy thay thế nội dung mẫu này bằng nội dung thực.)");
-    cbmwItemAppendContent("This is a default clipboard content. Replace it with your actual content. (Vietnamese: Đây là nội dung mẫu. Hãy thay thế nội dung mẫu này bằng nội dung thực.) This is a default clipboard content. Replace it with your actual content. (Vietnamese: Đây là nội dung mẫu. Hãy thay thế nội dung mẫu này bằng nội dung thực.)");
-    cbmwItemAppendContent("This is a default clipboard content. Replace it with your actual content. (Vietnamese: Đây là nội dung mẫu. Hãy thay thế nội dung mẫu này bằng nội dung thực.) This is a default clipboard content. Replace it with your actual content. (Vietnamese: Đây là nội dung mẫu. Hãy thay thế nội dung mẫu này bằng nội dung thực.)");
-
-    REP(i, 0, cbmwItemNum){
-        cbmwDrawItemId(i);
-    }
-
-    cbmwItemNum = 8;
-    SDL_SetRenderTarget(cbMainWindow->renderer, cbMainWindow->texture);
-    SDL_Rect scrop = {
-        .y = CBMW_MARGIN_TOP,
-        .x = CBMW_MARGIN_LEFT,
-        .h = CLIPBOARD_HEIGHT - CBMW_MARGIN_TOP - CBMW_MARGIN_BOTTOM,
-        .w = CLIPBOARD_WIDTH  - CBMW_MARGIN_LEFT - CBMW_MARGIN_RIGHT
-    }, dcrop = scrop;
-    SDL_RenderCopy(cbMainWindow->renderer, cbmwTempTexture, &scrop, &dcrop);
-    cbmwLoadOffScreen();
-    cbmwUpdateOnScreen();
-
-    struct timespec ts = {.tv_sec = 0, .tv_nsec = __USEC(500)};
-    while (1){
-        int clickedItemID = cbmwItemClickedFind();
-        if(clickedItemID >= 0) __log("Clicked item-%d", clickedItemID);
-        nanosleep(&ts, NULL);
-    }
-    
-
-    __WAIT_FOR_INFINITY__;
-}
-
 static inline void __processMouseEvent_Popup(SDL_Event e){
     if(isInsideButtonClose(e.button.y, e.button.x)){
         __log("[__processMouseEvent] Clicked close popup button!");
-        __uiFlagSet(UI_FLAG_POPUP_CLICKED_CLOSE);
+        __uiFlagSet(CBPU_CLICKED_CLOSE);
         cbpuPushEvent(CBPU_EVENT_CLOSE, 0, 0);
     }
     if(isInsideButtonYes(e.button.y, e.button.x)){
         __log("[__processMouseEvent] Clicked close popup button!");
-        __uiFlagSet(UI_FLAG_POPUP_CLICKED_YES);
+        __uiFlagSet(CBPU_CLICKED_YES);
         cbpuPushEvent(CBPU_EVENT_CLOSE, 0, 0);
     }
     if(isInsideButtonNo(e.button.y, e.button.x)){
         __log("[__processMouseEvent] Clicked close popup button!");
-        __uiFlagSet(UI_FLAG_POPUP_CLICKED_NO);
+        __uiFlagSet(CBPU_CLICKED_NO);
         cbpuPushEvent(CBPU_EVENT_CLOSE, 0, 0);
     }
 }
@@ -154,16 +102,18 @@ static inline void __processMouseEvent_MainWindow(SDL_Event e){
 
         case SDL_MOUSEWHEEL:
             if (e.wheel.y > 0){
+                cbmwMouseWheel = (cbmwMouseWheel < 0) ? (1) : (cbmwMouseWheel+1);
                 __log("[__processMouseEvent_MainWindow] Scroll up");
             }
             if (e.wheel.y < 0){
+                cbmwMouseWheel = (cbmwMouseWheel > 0) ? (-1) : (cbmwMouseWheel-1);
                 __log("[__processMouseEvent_MainWindow] Scroll down");
             }
             break;
     }
 }
 
-void __processKeyboardEvent(SDL_Event e){
+static inline void __processKeyboardEvent(SDL_Event e){
     switch (e.type){
         case SDL_KEYDOWN:
             if (e.key.keysym.sym == SDLK_q) {
@@ -175,16 +125,16 @@ void __processKeyboardEvent(SDL_Event e){
             }
             else if(e.key.keysym.sym == SDLK_r){
                 __log("Event <SDL_KEYDOWN | SDLK_r> occured!");
-                __uiFlagSet(CB_RELOAD);
+                __uiFlagSet(CPMW_RELOAD_ITEM);
             }
             else if(e.key.keysym.sym == SDLK_w){
                 __log("Event <SDL_KEYDOWN | SDLK_w> occured!");
-                __uiFlagSet(CB_SCROLL_UP);
+                __uiFlagSet(CPMW_SCROLL_ITEM_UP);
                 
             }
             else if(e.key.keysym.sym == SDLK_s){
                 __log("Event <SDL_KEYDOWN | SDLK_s> occured!");
-                __uiFlagSet(CB_SCROLL_DOWN);
+                __uiFlagSet(CPMW_SCROLL_ITEM_DOWN);
                 
             }
             // else if(SDLK_0 <= e.key.keysym.sym && e.key.keysym.sym <= SDLK_9){
@@ -202,7 +152,7 @@ void __processKeyboardEvent(SDL_Event e){
     }
 }
 
-void __processMouseEvent(SDL_Event e){
+static inline void __processMouseEvent(SDL_Event e){
     switch (e.type){
         case SDL_MOUSEBUTTONUP:
         case SDL_MOUSEBUTTONDOWN:
@@ -227,11 +177,11 @@ void __processMouseEvent(SDL_Event e){
     }
 }
 
-void __processWindowEvent(SDL_Event e){
+static inline void __processWindowEvent(SDL_Event e){
     __log("[__processWindowEvent] Currently, __processWindowEvent is empty!");
 }
 
-void __processPopupEvent(SDL_Event e){
+static inline void __processPopupEvent(SDL_Event e){
     __log("[__processPopupEvent] Currently, __processPopupEvent is empty!");
     if(e.type == CB_POPUP_EVENT){
         switch (e.user.code)
@@ -256,6 +206,86 @@ void __processPopupEvent(SDL_Event e){
             break;
         }
     }
+}
+
+void* eventCaptureService(void* pv){
+    /* Event routing */
+    SDL_Event e;
+    struct timespec ts_idle = {.tv_sec = 0, .tv_nsec = 100};
+    while (!IS_SYSTEM_STOPPED) {
+        while (SDL_PollEvent(&e)) {
+            switch (e.type){
+                case SDL_QUIT:
+                    __log("[main] Event <SDL_QUIT> occured! --> Stop the system!");
+                    __SET_SYSTEM_STOP__;
+                    break;
+                
+                case SDL_KEYUP:
+                case SDL_KEYDOWN:
+                    __processKeyboardEvent(e);
+                    break;
+
+                case SDL_MOUSEBUTTONUP:
+                case SDL_MOUSEBUTTONDOWN:
+                case SDL_MOUSEWHEEL:
+                    __processMouseEvent(e);
+                    break;
+
+                case SDL_WINDOWEVENT:
+                    __processWindowEvent(e);
+                    break;
+
+                default:
+                    if(e.type == CB_POPUP_EVENT){
+                        __processPopupEvent(e);
+                    }
+                    break;
+
+            }
+            nanosleep(&ts_idle, NULL);
+        }
+        nanosleep(&ts_idle, NULL);
+    }
+}
+
+void* cbTestThread(void* pv){
+    __WAIT_FOR_INIT__;
+
+    CBPU_SET_TITLE("Message from ngxxfus");
+    CBPU_SET_MESSAGE("This is a demo version. Use it at your own risk — I am not responsible for any issues that may occur! (Vietnamese: Đây là phiên bản thử nghiệm! Hãy cẩn thận khi sử dụng — tôi không chịu trách nhiệm nếu xảy ra sự cố.)");
+    cbpuPushEvent(CBPU_EVENT_SHOW_YESNO, NULL, NULL);
+    __log("[cbTestThread] sizeof(₍₍⚞(˶˃ ꒳ ˂˶)⚟⁾⁾) = %d", sizeof("₍₍⚞(˶˃ ꒳ ˂˶)⚟⁾⁾"));
+
+    flag_t clickedNo    = __flagMask(CBPU_CLICKED_NO);
+    flag_t clickedYes   = __flagMask(CBPU_CLICKED_YES);
+    flag_t clickedClose = __flagMask(CBPU_CLICKED_CLOSE);
+    flag_t currentState = 0;
+    do{
+        currentState = __uiFlagGetFull();
+        if(currentState & clickedYes){
+            __uiFlagClr(CBPU_CLICKED_YES);
+            appAgreement = 0xAC;
+            break;
+        }
+        if(currentState & clickedNo){
+            __uiFlagClr(CBPU_CLICKED_NO);
+            CBPU_SET_MESSAGE("Closing...");
+            cbpuPushEvent(CBPU_EVENT_SHOW_MSG, NULL, NULL);
+            sleep(1);            
+            __SET_SYSTEM_STOP__;
+        }
+        __sleep_ns(1000);
+    }while(1);
+
+
+    struct timespec ts = {.tv_sec = 0, .tv_nsec = __USEC(500)};
+    while (1){
+        cbmwItemSelected = cbmwItemClickedFind();
+        if(cbmwItemSelected >= 0) __log("Clicked item-%d", cbmwItemSelected);
+        nanosleep(&ts, NULL);
+    }
+
+    __WAIT_FOR_INFINITY__;
 }
 
 void myClipboardInit(){
@@ -301,6 +331,10 @@ void myClipboardInit(){
     __log("[myClipboardInit] [+task] clipboardCaptureDaemon");
     pthread_t clipboardCaptureDaemon;
     pthread_create(&clipboardCaptureDaemon, NULL, clipboardCaptureService, NULL);
+
+    __log("[myClipboardInit] [+task] eventCaptureService");
+    pthread_t eventCaptureDaemon;
+    pthread_create(&eventCaptureDaemon, NULL, eventCaptureService, NULL);
 
     __log("[myClipboardInit] [+task] cbTestThread");
     pthread_t cbTestDaemon;

@@ -83,43 +83,43 @@ void cbColorSetRGBA(cbColor_t *c, uint32_t rgba) {
 }
 
 
-const char *STR_DEFAULT_RETURN_STATUS(enum DEFAULT_RETURN_STATUS ret)
-{
-    switch (ret) {
-        case OKE:                     return STR_OKE;
-        case ERR:                     return STR_ERR;
-        case ERR_NULL:                return STR_ERR_NULL;
-        case ERR_MALLOC_FAILED:       return STR_ERR_MALLOC_FAILED;
-        case ERR_TIMEOUT:             return STR_ERR_TIMEOUT;
-        case ERR_BUSY:                return STR_ERR_BUSY;
-        case ERR_INVALID_ARG:         return STR_ERR_INVALID_ARG;
-        case ERR_OVERFLOW:            return STR_ERR_OVERFLOW;
-        case ERR_UNDERFLOW:           return STR_ERR_UNDERFLOW;
-        case ERR_NOT_FOUND:           return STR_ERR_NOT_FOUND;
-        case ERR_ALREADY_EXISTS:      return STR_ERR_ALREADY_EXISTS;
-        case ERR_NOT_IMPLEMENTED:     return STR_ERR_NOT_IMPLEMENTED;
-        case ERR_UNSUPPORTED:         return STR_ERR_UNSUPPORTED;
-        case ERR_IO:                  return STR_ERR_IO;
-        case ERR_PERMISSION:          return STR_ERR_PERMISSION;
-        case ERR_CRC:                 return STR_ERR_CRC;
-        case ERR_INIT_FAILED:         return STR_ERR_INIT_FAILED;
-        case ERR_PSRAM_FAILED:        return STR_ERR_PSRAM_FAILED;
+// const char *STR_DEFAULT_RETURN_STATUS DEFAULT_RETURN_STATUS_STR(enum DEFAULT_RETURN_STATUS ret)
+// {
+//     switch (ret) {
+//         case OKE:                     return STR_OKE;
+//         case ERR:                     return STR_ERR;
+//         case ERR_NULL:                return STR_ERR_NULL;
+//         case ERR_MALLOC_FAILED:       return STR_ERR_MALLOC_FAILED;
+//         case ERR_TIMEOUT:             return STR_ERR_TIMEOUT;
+//         case ERR_BUSY:                return STR_ERR_BUSY;
+//         case ERR_INVALID_ARG:         return STR_ERR_INVALID_ARG;
+//         case ERR_OVERFLOW:            return STR_ERR_OVERFLOW;
+//         case ERR_UNDERFLOW:           return STR_ERR_UNDERFLOW;
+//         case ERR_NOT_FOUND:           return STR_ERR_NOT_FOUND;
+//         case ERR_ALREADY_EXISTS:      return STR_ERR_ALREADY_EXISTS;
+//         case ERR_NOT_IMPLEMENTED:     return STR_ERR_NOT_IMPLEMENTED;
+//         case ERR_UNSUPPORTED:         return STR_ERR_UNSUPPORTED;
+//         case ERR_IO:                  return STR_ERR_IO;
+//         case ERR_PERMISSION:          return STR_ERR_PERMISSION;
+//         case ERR_CRC:                 return STR_ERR_CRC;
+//         case ERR_INIT_FAILED:         return STR_ERR_INIT_FAILED;
+//         case ERR_PSRAM_FAILED:        return STR_ERR_PSRAM_FAILED;
 
-        case ERR_SDL_INIT_FAILED:     return STR_ERR_SDL_INIT_FAILED;
-        case ERR_SDL_WINDOW_FAILED:   return STR_ERR_SDL_WINDOW_FAILED;
-        case ERR_SDL_RENDER_FAILED:   return STR_ERR_SDL_RENDER_FAILED;
-        case ERR_SDL_TTF_FAILED:      return STR_ERR_SDL_TTF_FAILED;
-        case ERR_SDL_IMAGE_FAILED:    return STR_ERR_SDL_IMAGE_FAILED;
+//         case ERR_SDL_INIT_FAILED:     return STR_ERR_SDL_INIT_FAILED;
+//         case ERR_SDL_WINDOW_FAILED:   return STR_ERR_SDL_WINDOW_FAILED;
+//         case ERR_SDL_RENDER_FAILED:   return STR_ERR_SDL_RENDER_FAILED;
+//         case ERR_SDL_TTF_FAILED:      return STR_ERR_SDL_TTF_FAILED;
+//         case ERR_SDL_IMAGE_FAILED:    return STR_ERR_SDL_IMAGE_FAILED;
 
-        case ERR_XORG_DISPLAY_FAILED: return STR_ERR_XORG_DISPLAY_FAILED;
-        case ERR_XORG_WINDOW_FAILED:  return STR_ERR_XORG_WINDOW_FAILED;
-        case ERR_XORG_DRAW_FAILED:    return STR_ERR_XORG_DRAW_FAILED;
+//         case ERR_XORG_DISPLAY_FAILED: return STR_ERR_XORG_DISPLAY_FAILED;
+//         case ERR_XORG_WINDOW_FAILED:  return STR_ERR_XORG_WINDOW_FAILED;
+//         case ERR_XORG_DRAW_FAILED:    return STR_ERR_XORG_DRAW_FAILED;
 
-        case ERR_FILE_NOT_FOUND:      return STR_ERR_FILE_NOT_FOUND;
-        case ERR_FILE_READ_FAILED:    return STR_ERR_FILE_READ_FAILED;
-        case ERR_FILE_WRITE_FAILED:   return STR_ERR_FILE_WRITE_FAILED;
-        case ERR_PATH_INVALID:        return STR_ERR_PATH_INVALID;
+//         case ERR_FILE_NOT_FOUND:      return STR_ERR_FILE_NOT_FOUND;
+//         case ERR_FILE_READ_FAILED:    return STR_ERR_FILE_READ_FAILED;
+//         case ERR_FILE_WRITE_FAILED:   return STR_ERR_FILE_WRITE_FAILED;
+//         case ERR_PATH_INVALID:        return STR_ERR_PATH_INVALID;
 
-        default:                      return "ERR_UNKNOWN";
-    }
-}
+//         default:                      return "ERR_UNKNOWN";
+//     }
+// }

@@ -27,42 +27,25 @@ int main(void) {
 
     /// Main thread /////////////////////////////////////////////////////////////////////
 
-    /* Event routing */
+    /* MainWindow control & routing */
     SDL_Event e;
-    struct timespec ts_idle = {.tv_sec = 0, .tv_nsec = 100};
+    struct timespec ts = {.tv_sec = 0, .tv_nsec = __USEC(10)};
     while (!IS_SYSTEM_STOPPED) {
-        while (SDL_PollEvent(&e)) {
-            switch (e.type){
-                case SDL_QUIT:
-                    __log("[main] Event <SDL_QUIT> occured! --> Stop the system!");
-                    __SET_SYSTEM_STOP__;
-                    break;
-                
-                case SDL_KEYUP:
-                case SDL_KEYDOWN:
-                    __processKeyboardEvent(e);
-                    break;
+        flag_t currentUIFlag = __uiFlagGetFull();
+        
+        while(currentUIFlag){
 
-                case SDL_MOUSEBUTTONUP:
-                case SDL_MOUSEBUTTONDOWN:
-                case SDL_MOUSEWHEEL:
-                    __processMouseEvent(e);
-                    break;
-
-                case SDL_WINDOWEVENT:
-                    __processWindowEvent(e);
-                    break;
-
-                default:
-                    if(e.type == CB_POPUP_EVENT){
-                        __processPopupEvent(e);
-                    }
-                    break;
-
+            if(currentUIFlag & __flagMask(CPMW_RELOAD_ITEM)){
+                SDL_RenderPresent(cbMainWindow->renderer);
+                continue;
             }
-            nanosleep(&ts_idle, NULL);
+            if(currentUIFlag) {
+                __log("[main] Warn: Un-processed flag bit [0x%x]!", currentUIFlag);
+                currentUIFlag = 0;
+                __uiFlagSetFull(currentUIFlag);
+            }
         }
-        nanosleep(&ts_idle, NULL);
+        nanosleep(&ts, NULL);
     }
 
     __exit("main(void)");

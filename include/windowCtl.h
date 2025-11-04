@@ -25,7 +25,6 @@ cbWindowContexts wdcts;
 #define fontBodyH       TTF_FontHeight(systemFont.body.ttf)
 
 SDL_Texture *cbmwTempTexture;
-
 typedef union cbmwItemInfo_t{
     SDL_Rect SDL;
     struct {
@@ -35,19 +34,30 @@ typedef union cbmwItemInfo_t{
     };
 } cbmwItemInfo_t;
 
-enum UI_STATUS_BITORDER{
-    CB_RELOAD = 0,
-    CB_SCROLL_UP,
-    CB_SCROLL_DOWN,
-    CB_MOUSE_CLICKED
-};
-
 cbmwItemInfo_t      cbmwItemArea[CBMW_ITEM_NUM] = {};
 int                 cbmwItemNum = 0;
-int                 cbmwCurrentItemIndex = 0;
 int                 cbmwMouseX, cbmwMouseY;
-char                cbmwItemContent[CBMW_ITEM_NUM][256];
 
+int                 cbmwMouseWheel;                             /// =0 :  | <0 : Scroll up | >0 : Scroll down
+int                 cbmwCurrentItemIdStart = 0;                 /// Record start idenx (show in main window)
+
+char                cbmwItemContent[CBMW_ITEM_NUM][256] = {};   /// Record content/imagepath for preview
+char                cbmwItemType[CBMW_ITEM_NUM] = {};           /// =0 : Text | =1 : Image
+char                cbmwItemSelected;                           /// -1 : No item selected | >=0 : select item with id=*
+
+// enum UI_STATUS_BITORDER{
+//     CPMW_RELOAD_ITEM = 0,
+//     CPMW_SCROLL_ITEM_UP,
+//     CPMW_SCROLL_ITEM_DOWN,
+//     CBMW_MOUSE_CLICKED
+// };
+
+enum CBMW_ITEM_CONTENT_TYPE{
+    CBMW_ITEM_TEXT = 0,
+    CBMW_ITEM_IMAGE,
+    CBMW_ITEM_MIX,
+    CBMW_ITEM_TYPE_NUM
+};
 
 void cbmwSetRenderTargetOnScreen(){
     SDL_SetRenderTarget(cbMainWindow->renderer, NULL);
@@ -55,11 +65,6 @@ void cbmwSetRenderTargetOnScreen(){
 
 void cbmwSetRenderTargetOffScreen(){
     SDL_SetRenderTarget(cbMainWindow->renderer, cbMainWindow->texture);
-}
-
-void cbmwClearBackground(){
-    SDL_SetRenderDrawColor(cbMainWindow->renderer, splitRGBA(systemColor.background));
-    SDL_RenderClear(cbMainWindow->renderer);
 }
 
 void cbmwUpdateOnScreen(){
@@ -123,7 +128,13 @@ void cbmwDrawTitle(){
     SDL_FreeSurface(surface);
 }
 
+void cbmwClearBackground(){
+    SDL_SetRenderDrawColor(cbMainWindow->renderer, splitRGBA(systemColor.background));
+    SDL_RenderClear(cbMainWindow->renderer);
+}
+
 void cbmwDrawInfo(){
+    cbmwDrawTitle();
     cbmwDrawTextLine(
         CLIPBOARD_HEIGHT-fontBodyH-5, 
         CLIPBOARD_WIDTH/7,
@@ -236,12 +247,18 @@ int cbmwItemClickedFind(){
 def cbmwItemChangeContent(int id, const char * newContent){
     if(id >= cbmwItemNum) return ERR;
     snprintf(cbmwItemContent[id], 256, "%s", newContent);
+    return OKE;
 }
 
-def cbmwItemAppendContent(const char * newContent){
+def cbmwAppendItem(const char * newContent){
     if(cbmwItemNum >= CBMW_ITEM_NUM) return ERR;
     snprintf(cbmwItemContent[cbmwItemNum], 256, "%s", newContent);
     return ++cbmwItemNum;
+}
+
+def cbmwClearAllItem(){
+    cbmwItemNum = 0;
+    return OKE;
 }
 
 def cbmwDrawItemId(int id){
@@ -249,8 +266,35 @@ def cbmwDrawItemId(int id){
         cbmwDrawTextItem(id, 0, cbmwItemContent[id]);
     else
         cbmwDrawTextItem(id, cbmwItemArea[id-1].row+cbmwItemArea[id-1].h+10, cbmwItemContent[id]);
+    return OKE;
 }
     
+def cbmwDrawItems(int idStart){
+    SDL_SetRenderTarget(cbMainWindow->renderer, cbmwTempTexture);
+    cbmwClearBackground();
+
+    cbmwClearAllItem();
+
+    REP(id, idStart, cbmwItemNum){
+        if(id < 1)
+            cbmwDrawTextItem(id, 0, cbmwItemContent[id]);
+        else
+            cbmwDrawTextItem(id, cbmwItemArea[id-1].row+cbmwItemArea[id-1].h+10, cbmwItemContent[id]);
+    }
+
+    cbmwItemNum = 8;
+    SDL_SetRenderTarget(cbMainWindow->renderer, cbMainWindow->texture);
+    SDL_Rect scrop = {
+        .y = CBMW_MARGIN_TOP,
+        .x = CBMW_MARGIN_LEFT,
+        .h = CLIPBOARD_HEIGHT - CBMW_MARGIN_TOP - CBMW_MARGIN_BOTTOM,
+        .w = CLIPBOARD_WIDTH  - CBMW_MARGIN_LEFT - CBMW_MARGIN_RIGHT
+    }, dcrop = scrop;
+    SDL_RenderCopy(cbMainWindow->renderer, cbmwTempTexture, &scrop, &dcrop);
+    cbmwLoadOffScreen();
+    cbmwUpdateOnScreen();
+    return OKE;
+}
 
 /// POP-UP ////////////////////////////////////////////////////////////////////////////////////////
 /// cbpu = Clipboard pop-up

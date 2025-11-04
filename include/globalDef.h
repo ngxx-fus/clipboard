@@ -38,11 +38,16 @@ _Atomic flag_t uiFlag;
 #define __uiFlagClr(bit)            atomic_fetch_and(&uiFlag, __flagInvMask(bit))
 
 enum UI_FLAG{
-    RESERVED = 0,
+    CPMW_RELOAD_ITEM,
+    CPMW_SCROLL_ITEM_UP,
+    CPMW_SCROLL_ITEM_DOWN,
+    CPMW_SELECT_ITEM,
+    CPMW_DELETE_ITEM,
+    CPMW_CLICKED_RELOAD,
     /// POP_UP
-    UI_FLAG_POPUP_CLICKED_CLOSE,
-    UI_FLAG_POPUP_CLICKED_YES,
-    UI_FLAG_POPUP_CLICKED_NO,
+    CBPU_CLICKED_CLOSE,
+    CBPU_CLICKED_YES,
+    CBPU_CLICKED_NO,
     UI_FLAG_NUM
 };
 

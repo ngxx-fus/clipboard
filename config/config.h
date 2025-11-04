@@ -46,10 +46,10 @@ extern "C" {
 #define KEYCODE_Q                   24
 
 /// ??? ?????? ////////////////////////////////////////////////////////////////////////////////////
-#define FONT_TITLE_PATH         "/usr/share/fonts/NerdFonts/ttf/BitstromWeraNerdFontPropo-Bold.ttf"
-#define FONT_BODY_PATH          "/usr/share/fonts/NerdFonts/ttf/BlexMonoNerdFontPropo-Medium.ttf"
-#define FONT_HEADING0_PATH      "/usr/share/fonts/NerdFonts/ttf/0xProtoNerdFontPropo-Regular.ttf"
-#define FONT_HEADING1_PATH      "/usr/share/fonts/NerdFonts/ttf/0xProtoNerdFontPropo-Regular.ttf"
+#define FONT_TITLE_PATH         "./localFont/BitstromWeraNerdFontPropo-Bold.ttf"
+#define FONT_BODY_PATH          "./localFont/BlexMonoNerdFontPropo-Medium.ttf"
+#define FONT_HEADING0_PATH      "./localFont/0xProtoNerdFontPropo-Regular.ttf"
+#define FONT_HEADING1_PATH      "./localFont/0xProtoNerdFontPropo-Regular.ttf"
 #define FONT_HEADING2_PATH      "/usr/share/fonts/TTF/Roboto-Regular.ttf"
 #define FONT_HEADING3_PATH      "/usr/share/fonts/TTF/DejaVuSans-Bold.ttf"
 #define FONT_ERROR_PATH         "/usr/share/fonts/TTF/FreeSansBoldOblique.ttf"
