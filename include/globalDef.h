@@ -49,7 +49,4 @@ enum UI_FLAG{
 uint8_t appAgreement = 0;
 
 
-
-
-
 #endif

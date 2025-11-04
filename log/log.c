@@ -35,3 +35,4 @@ void __coreLog(const char* tag, const char* format, ...) {
     __exitCriticalSection(&logMutex);
     va_end(args);
 }
+

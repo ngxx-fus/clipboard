@@ -1,37 +1,71 @@
-CC       := gcc
-CFLAGS   := -Wall -g
-LDFLAGS  := -lSDL2 -lSDL2_ttf -lpthread -lxcb -lz -lxcb-keysyms -lX11
-INCFLAGS := \
-			-Ihelper						\
-			-Ilog							\
-			-Iclipboard 					\
-			-IUI/wdct						\
-			-IUI							\
+# ==== Compiler & Flags ====
+CC        := gcc
+CFLAGS    := -Wall -Wextra -g
+LIBS      := -lSDL2 -lSDL2_ttf -lpthread -lxcb -lxcb-keysyms -lX11 -lz
+ROOT_DIR  := $(realpath .)
+INCFLAGS  := \
+	-I$(ROOT_DIR)/helper \
+	-I$(ROOT_DIR)/log \
+	-I$(ROOT_DIR)/clipboardManager \
+	-I$(ROOT_DIR)/windowContext \
+	-I$(ROOT_DIR)/font \
+	-I$(ROOT_DIR)/config
 
-APP      := myclipboard.c
-BIN      := myclipboard
+# ==== Colors ====
+RESET  := \033[0m
+BOLD   := \033[1m
+RED    := \033[31m
+GREEN  := \033[32m
+YELLOW := \033[33m
+BLUE   := \033[34m
 
-SRC      := $(APP) 							\
-			$(wildcard helper/*.c)			\
-			$(wildcard log/*.c)				\
-			$(wildcard clipboard/*.c) 		\
-			$(wildcard UI/*.c)				\
-			$(wildcard UI/wdct/*.c)			\
+# ==== Output & Directories ====
+TARGET    := myClipboard
+BUILD_DIR := build
 
-OBJ      := $(SRC:.c=.o)
+# ==== Source Files ====
+SRC := \
+	myClipboard.c \
+	$(wildcard helper/*.c) \
+	$(wildcard log/*.c) \
+	$(wildcard clipboardManager/*.c) \
+	$(wildcard windowContext/*.c) \
+	$(wildcard font/*.c)
 
-all: $(BIN)
+# ==== Object Files ====
+OBJ := $(patsubst %.c, $(BUILD_DIR)/%.o, $(SRC))
 
-.PHONY: all clean exec leak_check
+# ==== Default Target ====
+all: $(TARGET)
 
-$(BIN): $(OBJ)
-	$(CC) $(OBJ) -o $@ $(LDFLAGS)
+# ==== Build Executable ====
+$(TARGET): $(OBJ)
+	@echo "$(BOLD)$(BLUE)[LD]$(RESET) Linking $(YELLOW)$@$(RESET)"
+	$(CC) $(OBJ) -o $@ $(LIBS)
+	@echo "$(GREEN)[OK]$(RESET) Build complete: $(YELLOW)$@$(RESET)"
 
-%.o: %.c
+# ==== Compile Stage ====
+$(BUILD_DIR)/%.o: %.c
+	@mkdir -p $(dir $@)
+	@echo "$(BOLD)$(GREEN)[CC]$(RESET) Compiling $(YELLOW)$<$(RESET)"
 	$(CC) $(CFLAGS) $(INCFLAGS) -c $< -o $@
 
-clean:
-	rm -f $(OBJ) $(BIN)
+# ==== Utilities ====
+.PHONY: all clean run leak_check dirs
 
-exec:
-	./$(BIN)
+dirs:
+	@mkdir -p $(BUILD_DIR)
+
+clean:
+	@echo "$(BOLD)$(RED)[CLEAN]$(RESET) Removing build files"
+	rm -rf $(BUILD_DIR) $(TARGET)
+	@echo "$(GREEN)[OK]$(RESET) Clean done"
+
+run: $(TARGET)
+	@echo "$(BOLD)$(BLUE)[RUN]$(RESET) Executing $(YELLOW)./$(TARGET)$(RESET)"
+	./$(TARGET)
+
+# ==== Leak check ====
+leak_check: $(TARGET)
+	@echo "$(BOLD)$(YELLOW)[VALGRIND]$(RESET) Running memory check"
+	valgrind --leak-check=full --show-leak-kinds=all ./$(TARGET)

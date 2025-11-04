@@ -1,8 +1,0 @@
-{
-    "files.associations": {
-        "type_traits": "c",
-        "stdlib.h": "c",
-        "stdio.h": "c",
-        "clipboard.h": "c"
-    }
-}
